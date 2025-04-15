@@ -7,6 +7,10 @@
   "version": 2,
   "builds": [
     {
+      "src": "index.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "apps/frontend/next.config.js",
       "use": "@vercel/next"
     },
@@ -16,6 +20,10 @@
     }
   ],
   "routes": [
+    {
+      "src": "/",
+      "dest": "/index.html"
+    },
     {
       "src": "/api/(.*)",
       "dest": "apps/api/src/server.js",
