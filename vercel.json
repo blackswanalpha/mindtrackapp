@@ -1,5 +1,9 @@
 {
   "public": true,
+  "github": {
+    "enabled": true,
+    "silent": false
+  },
   "version": 2,
   "builds": [
     {
@@ -14,7 +18,15 @@
   "routes": [
     {
       "src": "/api/(.*)",
-      "dest": "apps/api/src/server.js"
+      "dest": "apps/api/src/server.js",
+      "headers": {
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, OPTIONS",
+        "Access-Control-Allow-Headers": "X-Requested-With, Content-Type, Accept"
+      }
+    },
+    {
+      "handle": "filesystem"
     },
     {
       "src": "/(.*)",
