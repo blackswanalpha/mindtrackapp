@@ -1,5 +1,7 @@
 # MindTrack App
 
+[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black)](https://mindtrackapp.vercel.app)
+
 A full-stack monorepo project with Next.js frontend and Express.js API using Neon as the database provider.
 
 ## Project Structure
