@@ -45,7 +45,8 @@ function isProtectedRoute(pathname: string): boolean {
     '/analytics',
     '/ai-analysis',
     '/settings',
-    '/email'
+    '/email',
+    '/google-forms'
   ];
 
   return protectedRoutes.some(route => pathname.startsWith(route));

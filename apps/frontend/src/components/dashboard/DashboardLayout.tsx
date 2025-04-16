@@ -12,6 +12,7 @@ const OrganizationIcon = () => <span className="mr-2">🏢</span>;
 const UserIcon = () => <span className="mr-2">👤</span>;
 const AnalyticsIcon = () => <span className="mr-2">📈</span>;
 const AIIcon = () => <span className="mr-2">🤖</span>;
+const GoogleFormsIcon = () => <span className="mr-2">📋</span>;
 const SettingsIcon = () => <span className="mr-2">⚙️</span>;
 const LogoutIcon = () => <span className="mr-2">🚪</span>;
 
@@ -166,6 +167,14 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 icon={<AIIcon />}
                 label={sidebarOpen ? 'AI Analysis' : ''}
                 active={pathname?.startsWith('/ai-analysis')}
+              />
+            </li>
+            <li>
+              <NavItem
+                href="/google-forms"
+                icon={<GoogleFormsIcon />}
+                label={sidebarOpen ? 'Google Forms' : ''}
+                active={pathname?.startsWith('/google-forms')}
               />
             </li>
             <li>

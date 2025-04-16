@@ -229,6 +229,13 @@ export const api = {
     },
 
     /**
+     * Get question by ID
+     */
+    getById: async (id: number) => {
+      return fetchWithErrorHandling(`${API_URL}/questions/${id}`);
+    },
+
+    /**
      * Update question
      */
     update: async (id: number, questionData: any) => {
@@ -457,6 +464,48 @@ export const api = {
      */
     search: async (term: string) => {
       return fetchWithErrorHandling(`${API_URL}/ai-analysis/search?term=${encodeURIComponent(term)}`);
+    }
+  },
+
+  /**
+   * Google Forms methods
+   */
+  googleForms: {
+    /**
+     * Get all Google Form responses
+     */
+    getAll: async (params?: { page?: number; limit?: number; sortBy?: string; sortOrder?: string }) => {
+      const queryParams = new URLSearchParams();
+      if (params?.page) queryParams.append('page', params.page.toString());
+      if (params?.limit) queryParams.append('limit', params.limit.toString());
+      if (params?.sortBy) queryParams.append('sortBy', params.sortBy);
+      if (params?.sortOrder) queryParams.append('sortOrder', params.sortOrder);
+
+      const queryString = queryParams.toString() ? `?${queryParams.toString()}` : '';
+      return fetchWithErrorHandling(`${API_URL}/google-forms${queryString}`);
+    },
+
+    /**
+     * Get a single Google Form response by ID
+     */
+    getById: async (id: number) => {
+      return fetchWithErrorHandling(`${API_URL}/google-forms/${id}`);
+    },
+
+    /**
+     * Import Google Form responses
+     */
+    import: async () => {
+      return fetchWithErrorHandling(`${API_URL}/google-forms/import`, {
+        method: 'POST'
+      });
+    },
+
+    /**
+     * Get Google Form response statistics
+     */
+    getStatistics: async () => {
+      return fetchWithErrorHandling(`${API_URL}/google-forms/statistics`);
     }
   }
 };

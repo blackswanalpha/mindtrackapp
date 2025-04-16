@@ -13,6 +13,7 @@ type Question = {
   type: string;
   required: boolean;
   options?: Array<{ value: number; label: string }>;
+  order_num: number;
 };
 
 type Answer = {
@@ -32,7 +33,7 @@ const QuestionnaireRespondPage = () => {
   const [error, setError] = useState('');
   const [uniqueCode, setUniqueCode] = useState('');
   const [patientEmail, setPatientEmail] = useState('');
-  
+
   // Fetch questionnaire and questions
   useEffect(() => {
     const fetchData = async () => {
@@ -40,23 +41,23 @@ const QuestionnaireRespondPage = () => {
         // Fetch questionnaire
         const questionnaireResponse = await apiClient.get(`/questionnaires/${id}`);
         setQuestionnaire(questionnaireResponse.data.questionnaire);
-        
+
         // Fetch questions
         const questionsResponse = await apiClient.get(`/questions?questionnaire_id=${id}`);
-        
+
         // Sort questions by order_num
         const sortedQuestions = questionsResponse.data.questions.sort(
           (a: Question, b: Question) => a.order_num - b.order_num
         );
-        
+
         setQuestions(sortedQuestions);
-        
+
         // Initialize answers array
         const initialAnswers = sortedQuestions.map((question: Question) => ({
           question_id: question.id,
           value: question.type === 'multiple_choice' ? [] : ''
         }));
-        
+
         setAnswers(initialAnswers);
       } catch (error) {
         const errorMessage = handleApiError(error, 'Failed to load questionnaire');
@@ -65,27 +66,27 @@ const QuestionnaireRespondPage = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchData();
   }, [id]);
-  
+
   // Handle answer change
   const handleAnswerChange = (questionId: number, value: any) => {
-    setAnswers(prevAnswers => 
-      prevAnswers.map(answer => 
+    setAnswers(prevAnswers =>
+      prevAnswers.map(answer =>
         answer.question_id === questionId ? { ...answer, value } : answer
       )
     );
   };
-  
+
   // Handle multiple choice answer change
   const handleMultipleChoiceChange = (questionId: number, optionValue: string, checked: boolean) => {
-    setAnswers(prevAnswers => 
+    setAnswers(prevAnswers =>
       prevAnswers.map(answer => {
         if (answer.question_id === questionId) {
           const currentValues = answer.value as string[];
           let newValues;
-          
+
           if (checked) {
             // Add value if checked
             newValues = [...currentValues, optionValue];
@@ -93,42 +94,42 @@ const QuestionnaireRespondPage = () => {
             // Remove value if unchecked
             newValues = currentValues.filter(v => v !== optionValue);
           }
-          
+
           return { ...answer, value: newValues };
         }
-        
+
         return answer;
       })
     );
   };
-  
+
   // Navigate to next question
   const handleNext = () => {
     // Validate current question if required
     const currentQuestion = questions[currentQuestionIndex];
     const currentAnswer = answers.find(a => a.question_id === currentQuestion.id);
-    
+
     if (currentQuestion.required) {
       const value = currentAnswer?.value;
-      
+
       if (
-        value === '' || 
-        value === null || 
-        value === undefined || 
+        value === '' ||
+        value === null ||
+        value === undefined ||
         (Array.isArray(value) && value.length === 0)
       ) {
         setError('This question is required');
         return;
       }
     }
-    
+
     setError('');
-    
+
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
-  
+
   // Navigate to previous question
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
@@ -136,30 +137,30 @@ const QuestionnaireRespondPage = () => {
       setError('');
     }
   };
-  
+
   // Submit questionnaire
   const handleSubmit = async () => {
     // Validate current question if required
     const currentQuestion = questions[currentQuestionIndex];
     const currentAnswer = answers.find(a => a.question_id === currentQuestion.id);
-    
+
     if (currentQuestion.required) {
       const value = currentAnswer?.value;
-      
+
       if (
-        value === '' || 
-        value === null || 
-        value === undefined || 
+        value === '' ||
+        value === null ||
+        value === undefined ||
         (Array.isArray(value) && value.length === 0)
       ) {
         setError('This question is required');
         return;
       }
     }
-    
+
     setIsSubmitting(true);
     setError('');
-    
+
     try {
       // Submit response
       const response = await apiClient.post('/responses', {
@@ -170,10 +171,10 @@ const QuestionnaireRespondPage = () => {
           value: answer.value
         }))
       });
-      
+
       // Get unique code
       const uniqueCode = response.data.response.unique_code;
-      
+
       // Redirect to completion page
       router.push(`/responses/complete/${uniqueCode}`);
     } catch (error) {
@@ -183,12 +184,12 @@ const QuestionnaireRespondPage = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   // Email input handler
   const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPatientEmail(e.target.value);
   };
-  
+
   // Render loading state
   if (isLoading) {
     return (
@@ -197,7 +198,7 @@ const QuestionnaireRespondPage = () => {
       </div>
     );
   }
-  
+
   // Render error state
   if (!questionnaire || !questions.length) {
     return (
@@ -206,11 +207,11 @@ const QuestionnaireRespondPage = () => {
       </div>
     );
   }
-  
+
   // Get current question
   const currentQuestion = questions[currentQuestionIndex];
   const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
-  
+
   // Render email collection if first question and email not set
   if (currentQuestionIndex === 0 && !patientEmail) {
     return (
@@ -220,7 +221,7 @@ const QuestionnaireRespondPage = () => {
           {questionnaire.description && (
             <p className="text-gray-600 mb-6">{questionnaire.description}</p>
           )}
-          
+
           <div className="mb-6">
             <label htmlFor="email" className="block text-gray-700 font-medium mb-2">
               Please enter your email address to continue
@@ -238,7 +239,7 @@ const QuestionnaireRespondPage = () => {
               Your email will be used to send you your results and for follow-up communications.
             </p>
           </div>
-          
+
           <Button
             variant="primary"
             onClick={() => setCurrentQuestionIndex(0)}
@@ -251,7 +252,7 @@ const QuestionnaireRespondPage = () => {
       </div>
     );
   }
-  
+
   return (
     <div className="container mx-auto px-4 py-8 max-w-2xl">
       <Card>
@@ -262,15 +263,15 @@ const QuestionnaireRespondPage = () => {
             Question {currentQuestionIndex + 1} of {questions.length}
           </p>
         </div>
-        
+
         {error && <Alert type="error" message={error} className="mb-4" />}
-        
+
         <div className="mb-8">
           <h2 className="text-xl font-semibold mb-2">{currentQuestion.text}</h2>
           {currentQuestion.description && (
             <p className="text-gray-600 mb-4">{currentQuestion.description}</p>
           )}
-          
+
           {/* Render different input types based on question type */}
           {currentQuestion.type === 'text' && (
             <textarea
@@ -281,7 +282,7 @@ const QuestionnaireRespondPage = () => {
               placeholder="Enter your answer here..."
             />
           )}
-          
+
           {currentQuestion.type === 'single_choice' && (
             <div className="space-y-2">
               {currentQuestion.options?.map((option) => (
@@ -302,7 +303,7 @@ const QuestionnaireRespondPage = () => {
               ))}
             </div>
           )}
-          
+
           {currentQuestion.type === 'multiple_choice' && (
             <div className="space-y-2">
               {currentQuestion.options?.map((option) => (
@@ -323,7 +324,7 @@ const QuestionnaireRespondPage = () => {
               ))}
             </div>
           )}
-          
+
           {currentQuestion.type === 'yes_no' && (
             <div className="space-y-2">
               <div className="flex items-center">
@@ -356,7 +357,7 @@ const QuestionnaireRespondPage = () => {
               </div>
             </div>
           )}
-          
+
           {currentQuestion.type === 'rating' && (
             <div className="flex space-x-4 justify-center my-4">
               {[1, 2, 3, 4, 5].map((rating) => (
@@ -375,7 +376,7 @@ const QuestionnaireRespondPage = () => {
               ))}
             </div>
           )}
-          
+
           {currentQuestion.type === 'scale' && (
             <div className="my-4">
               <div className="flex justify-between mb-2">
@@ -386,7 +387,7 @@ const QuestionnaireRespondPage = () => {
                 type="range"
                 min="1"
                 max="10"
-                value={answers.find(a => a.question_id === currentQuestion.id)?.value || 5}
+                value={String(answers.find(a => a.question_id === currentQuestion.id)?.value || 5)}
                 onChange={(e) => handleAnswerChange(currentQuestion.id, parseInt(e.target.value))}
                 className="w-full"
               />
@@ -396,7 +397,7 @@ const QuestionnaireRespondPage = () => {
               </div>
             </div>
           )}
-          
+
           {currentQuestion.type === 'date' && (
             <input
               type="date"
@@ -406,7 +407,7 @@ const QuestionnaireRespondPage = () => {
             />
           )}
         </div>
-        
+
         <div className="flex justify-between">
           <Button
             variant="secondary"
@@ -415,7 +416,7 @@ const QuestionnaireRespondPage = () => {
           >
             Previous
           </Button>
-          
+
           {currentQuestionIndex < questions.length - 1 ? (
             <Button variant="primary" onClick={handleNext}>
               Next
