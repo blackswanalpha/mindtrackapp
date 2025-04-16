@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import * as NavigationMenu from '@radix-ui/react-navigation-menu';
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu';
-import { Menu, X, ChevronDown, LogIn } from 'lucide-react';
+import { Menu, X, ChevronDown, LogIn, Beaker } from 'lucide-react';
 
 const Header: React.FC = () => {
   const [isScrolled, setIsScrolled] = useState(false);
@@ -86,6 +86,13 @@ const Header: React.FC = () => {
               <NavigationMenu.Item>
                 <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
                   Contact
+                </Link>
+              </NavigationMenu.Item>
+
+              <NavigationMenu.Item>
+                <Link href="/test" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center">
+                  Test Environment
+                  <Beaker className="ml-1 h-4 w-4" />
                 </Link>
               </NavigationMenu.Item>
             </NavigationMenu.List>
@@ -181,6 +188,11 @@ const Header: React.FC = () => {
 
                 <Link href="/contact" className="text-gray-700 hover:text-blue-600 transition-colors">
                   Contact
+                </Link>
+
+                <Link href="/test" className="text-gray-700 hover:text-blue-600 transition-colors flex items-center">
+                  Test Environment
+                  <Beaker className="ml-1 h-4 w-4" />
                 </Link>
 
                 <div className="flex flex-col space-y-2 pt-4 border-t border-gray-200">

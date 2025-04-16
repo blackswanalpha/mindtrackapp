@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, Button, Loading, Alert } from '@/components/common';
-import { ProtectedRoute } from '@/components/auth';
+// Remove ProtectedRoute as authentication is disabled
+// import { ProtectedRoute } from '@/components/auth';
 import { apiClient } from '@/lib/apiClient';
 import { handleApiError } from '@/utils/errorHandler';
 import { formatDate } from '@/utils/dateUtils';
@@ -23,7 +24,7 @@ const ResponseDetailPage = () => {
   const [response, setResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  
+
   // Fetch response details
   useEffect(() => {
     const fetchResponseDetails = async () => {
@@ -38,30 +39,30 @@ const ResponseDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchResponseDetails();
   }, [id]);
-  
+
   // Helper function to get question text
   const getQuestionText = (questionId: string): string => {
     return QUESTION_MAPPING[questionId] || `Question ${questionId}`;
   };
-  
+
   // Helper function to extract answer value
   const getAnswerValue = (answer: any): string => {
     if (!answer) return 'No answer';
-    
+
     if (answer.textAnswers && answer.textAnswers.answers) {
       return answer.textAnswers.answers.map((a: any) => a.value).join(', ');
-    } 
-    
+    }
+
     if (answer.choiceAnswers && answer.choiceAnswers.answers) {
       return answer.choiceAnswers.answers.map((a: any) => a.value).join(', ');
     }
-    
+
     return 'No answer';
   };
-  
+
   // Render loading state
   if (isLoading) {
     return (
@@ -72,7 +73,7 @@ const ResponseDetailPage = () => {
       </ProtectedRoute>
     );
   }
-  
+
   // Render error state
   if (error) {
     return (
@@ -90,7 +91,7 @@ const ResponseDetailPage = () => {
       </ProtectedRoute>
     );
   }
-  
+
   // Render response not found
   if (!response) {
     return (
@@ -112,11 +113,11 @@ const ResponseDetailPage = () => {
       </ProtectedRoute>
     );
   }
-  
+
   // Extract form data from response
   const formData = response.response_data;
   const answers = formData?.answers || {};
-  
+
   return (
     <ProtectedRoute requiredRoles={['admin', 'provider']}>
       <div className="container mx-auto px-4 py-8 max-w-3xl">
@@ -129,7 +130,7 @@ const ResponseDetailPage = () => {
             Back to Responses
           </Button>
         </div>
-        
+
         <Card className="mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
@@ -141,9 +142,9 @@ const ResponseDetailPage = () => {
               <p className="font-medium">{formatDate(response.created_at)}</p>
             </div>
           </div>
-          
+
           <h2 className="text-xl font-semibold mb-4">Responses</h2>
-          
+
           <div className="space-y-6">
             {Object.entries(answers).map(([questionId, answer]) => (
               <div key={questionId} className="border-b pb-4">

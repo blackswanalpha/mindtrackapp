@@ -12,6 +12,7 @@ const aiAnalysisRoutes = require('./aiAnalysisRoutes');
 const emailRoutes = require('./emailRoutes');
 const qrCodeRoutes = require('./qrCodeRoutes');
 const googleFormsRoutes = require('./googleFormsRoutes');
+const testRoutes = require('./testRoutes');
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -24,6 +25,7 @@ router.use('/ai-analysis', aiAnalysisRoutes);
 router.use('/email', emailRoutes);
 router.use('/qr-codes', qrCodeRoutes);
 router.use('/google-forms', googleFormsRoutes);
+router.use('/test', testRoutes);
 
 // Health check route
 router.get('/health', (_, res) => {

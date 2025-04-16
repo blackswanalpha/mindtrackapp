@@ -2,57 +2,18 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // This function can be marked `async` if using `await` inside
-export function middleware(request: NextRequest) {
-  const token = request.cookies.get('token')?.value;
-  const isAuthPage = request.nextUrl.pathname.startsWith('/login') ||
-                     request.nextUrl.pathname.startsWith('/register');
-
-  // If trying to access a protected route without being logged in
-  if (!token && !isAuthPage && isProtectedRoute(request.nextUrl.pathname)) {
-    return NextResponse.redirect(new URL('/login', request.url));
-  }
-
-  // If trying to access login/register while logged in
-  if (token && isAuthPage) {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
+export function middleware(_request: NextRequest) {
+  // AUTHENTICATION DISABLED - All routes are public
   return NextResponse.next();
 }
 
-// Check if the route is protected
+// This function is no longer used but kept for reference
+// All routes are now public
+/*
 function isProtectedRoute(pathname: string): boolean {
-  // Public routes that should not be protected
-  const publicRoutes = [
-    '/questionnaires/respond',
-    '/responses/complete',
-    '/responses/view',
-    '/scan',
-    '/dashboard',
-    '/google-forms'
-  ];
-
-  // Check if the path is a public route
-  if (publicRoutes.some(route => pathname.startsWith(route))) {
-    return false;
-  }
-
-  // Protected routes that require authentication
-  const protectedRoutes = [
-    '/dashboard',
-    '/questionnaires',
-    '/responses',
-    '/organizations',
-    '/users',
-    '/analytics',
-    '/ai-analysis',
-    '/settings',
-    '/email',
-    '/google-forms'
-  ];
-
-  return protectedRoutes.some(route => pathname.startsWith(route));
+  return false;
 }
+*/
 
 // See "Matching Paths" below to learn more
 export const config = {

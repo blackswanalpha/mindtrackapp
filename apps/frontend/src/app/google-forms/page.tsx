@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card, Button, Loading, Alert, Table } from '@/components/common';
-import { ProtectedRoute } from '@/components/auth';
+// Authentication is disabled - no need for ProtectedRoute
 import { apiClient } from '@/lib/apiClient';
 import { handleApiError } from '@/utils/errorHandler';
 import { formatDate } from '@/utils/dateUtils';
@@ -16,13 +16,13 @@ const GoogleFormsPage = () => {
   const [isImporting, setIsImporting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  
+
   // Fetch responses on mount
   useEffect(() => {
     fetchResponses();
     fetchStatistics();
   }, []);
-  
+
   // Fetch form responses
   const fetchResponses = async () => {
     try {
@@ -36,7 +36,7 @@ const GoogleFormsPage = () => {
       setIsLoading(false);
     }
   };
-  
+
   // Fetch statistics
   const fetchStatistics = async () => {
     try {
@@ -46,16 +46,16 @@ const GoogleFormsPage = () => {
       console.error('Failed to fetch statistics:', error);
     }
   };
-  
+
   // Import form responses
   const handleImport = async () => {
     try {
       setIsImporting(true);
       setError('');
       setSuccess('');
-      
+
       const response = await apiClient.post('/google-forms/import');
-      
+
       setSuccess(response.data.message);
       fetchResponses();
       fetchStatistics();
@@ -66,7 +66,7 @@ const GoogleFormsPage = () => {
       setIsImporting(false);
     }
   };
-  
+
   // Define table columns
   const columns = [
     {
@@ -93,10 +93,9 @@ const GoogleFormsPage = () => {
       )
     }
   ];
-  
+
   return (
-    <ProtectedRoute requiredRoles={['admin', 'provider']}>
-      <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Google Form Responses</h1>
           <Button
@@ -107,10 +106,10 @@ const GoogleFormsPage = () => {
             Import Responses
           </Button>
         </div>
-        
+
         {error && <Alert type="error" message={error} className="mb-4" />}
         {success && <Alert type="success" message={success} className="mb-4" />}
-        
+
         {statistics && (
           <Card className="mb-6">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
@@ -133,7 +132,7 @@ const GoogleFormsPage = () => {
             </div>
           </Card>
         )}
-        
+
         {isLoading ? (
           <Loading size="large" message="Loading responses..." />
         ) : responses.length === 0 ? (
@@ -153,7 +152,6 @@ const GoogleFormsPage = () => {
           />
         )}
       </div>
-    </ProtectedRoute>
   );
 };
 

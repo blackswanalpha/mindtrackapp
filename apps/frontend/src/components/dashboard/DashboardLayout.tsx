@@ -89,6 +89,12 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   };
 
   const handleLogout = () => {
+    // AUTHENTICATION DISABLED
+    // Just redirect to home page
+    router.push('/');
+
+    // Original logout code (commented out)
+    /*
     if (typeof window !== 'undefined') {
       // Clear user data from localStorage
       localStorage.removeItem('token');
@@ -97,6 +103,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
       // Redirect to login page
       router.push('/login');
     }
+    */
   };
 
   return (

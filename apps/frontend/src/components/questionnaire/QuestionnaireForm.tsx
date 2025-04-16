@@ -41,7 +41,7 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -61,7 +61,9 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
         ...formData,
         estimated_time: formData.estimated_time ? parseInt(formData.estimated_time) : undefined,
         max_responses: formData.max_responses ? parseInt(formData.max_responses) : undefined,
-        organization_id: formData.organization_id ? parseInt(formData.organization_id) : undefined,
+        organization_id: formData.organization_id ? parseInt(formData.organization_id) : 1, // Default to organization ID 1
+        // Add mock user data since authentication is disabled
+        created_by_id: 1, // Mock user ID
       };
 
       if (isEditing && initialData?.id) {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Brain, Activity, Shield, QrCode, ScanLine } from 'lucide-react';
+import { ArrowRight, Brain, Activity, Shield, QrCode, ScanLine, Beaker } from 'lucide-react';
 import Link from 'next/link';
 
 const HeroSection: React.FC = () => {
@@ -104,6 +104,26 @@ const HeroSection: React.FC = () => {
               >
                 Scan QR Code
                 <ScanLine className="ml-2 h-4 w-4" />
+              </motion.button>
+            </Link>
+            <Link href="/test">
+              <motion.button
+                className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Test Environment
+                <Beaker className="ml-2 h-4 w-4" />
+              </motion.button>
+            </Link>
+            <Link href="/test">
+              <motion.button
+                className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Test Environment
+                <Beaker className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
           </motion.div>

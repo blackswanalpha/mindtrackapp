@@ -39,48 +39,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize auth state from localStorage
+  // Initialize auth state with a mock user
   useEffect(() => {
-    // Only run in browser environment
-    if (typeof window !== 'undefined') {
-      const storedToken = localStorage.getItem('token');
-      const storedUser = localStorage.getItem('user');
+    // AUTHENTICATION DISABLED: Always provide a mock user
+    const mockUser: User = {
+      id: 1,
+      name: 'Admin User',
+      email: 'admin@example.com',
+      role: 'admin'
+    };
 
-      if (storedToken && storedUser) {
-        try {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
-        } catch (e) {
-          // If there's an error parsing the user, clear the storage
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-        }
-      }
-    }
+    setUser(mockUser);
+    setToken('mock-token-12345');
+
+    // Set mock data in localStorage for consistency
+    localStorage.setItem('token', 'mock-token-12345');
+    localStorage.setItem('user', JSON.stringify(mockUser));
 
     // Always set loading to false
     setIsLoading(false);
   }, []);
 
-  // Login function
-  const login = async (email: string, password: string) => {
-    try {
-      setIsLoading(true);
-      setError(null);
+  // Login function (disabled - always succeeds with mock user)
+  const login = async (_email: string, _password: string) => {
+    // AUTHENTICATION DISABLED: Always succeed with mock user
+    const mockUser: User = {
+      id: 1,
+      name: 'Admin User',
+      email: 'admin@example.com',
+      role: 'admin'
+    };
 
-      // Call login API
-      const response = await api.auth.login(email, password);
-
-      // Save token and user to state and localStorage
-      setToken(response.token);
-      setUser(response.user);
-      localStorage.setItem('token', response.token);
-      localStorage.setItem('user', JSON.stringify(response.user));
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed');
-    } finally {
-      setIsLoading(false);
-    }
+    setToken('mock-token-12345');
+    setUser(mockUser);
+    localStorage.setItem('token', 'mock-token-12345');
+    localStorage.setItem('user', JSON.stringify(mockUser));
   };
 
   // Register function

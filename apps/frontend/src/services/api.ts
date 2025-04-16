@@ -5,13 +5,12 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
 
 /**
- * Get auth token from localStorage
+ * Get auth token from localStorage or return a mock token
+ * AUTHENTICATION DISABLED: Always return a mock token
  */
-const getToken = (): string | null => {
-  if (typeof window !== 'undefined') {
-    return localStorage.getItem('token');
-  }
-  return null;
+const getToken = (): string => {
+  // Always return a mock token since authentication is disabled
+  return 'mock-token-for-disabled-auth';
 };
 
 /**
@@ -19,14 +18,12 @@ const getToken = (): string | null => {
  */
 async function fetchWithErrorHandling(url: string, options: RequestInit = {}) {
   try {
-    // Add auth token to headers if available
+    // Always add auth token to headers (authentication is disabled)
     const token = getToken();
-    if (token) {
-      options.headers = {
-        ...options.headers,
-        Authorization: `Bearer ${token}`
-      };
-    }
+    options.headers = {
+      ...options.headers,
+      Authorization: `Bearer ${token}`
+    };
 
     const response = await fetch(url, options);
 
