@@ -42,7 +42,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header 
+    <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled ? 'bg-white shadow-md py-2' : 'bg-transparent py-4'
       }`}
@@ -104,11 +104,20 @@ const Header: React.FC = () => {
             </Link>
             <Link href="/register">
               <motion.button
-                className="flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                className="text-gray-700 hover:text-blue-600 transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 Sign up
+              </motion.button>
+            </Link>
+            <Link href="/dashboard">
+              <motion.button
+                className="flex items-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                Dashboard
                 <LogIn className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
@@ -178,9 +187,12 @@ const Header: React.FC = () => {
                   <Link href="/login" className="text-gray-700 hover:text-blue-600 transition-colors">
                     Log in
                   </Link>
-                  <Link href="/register">
+                  <Link href="/register" className="text-gray-700 hover:text-blue-600 transition-colors">
+                    Sign up
+                  </Link>
+                  <Link href="/dashboard">
                     <button className="w-full flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
-                      Sign up
+                      Dashboard
                       <LogIn className="ml-2 h-4 w-4" />
                     </button>
                   </Link>
@@ -203,7 +215,7 @@ const FeatureLink: React.FC<FeatureLinkProps> = ({ href, title }) => {
   return (
     <li>
       <NavigationMenu.Link asChild>
-        <Link 
+        <Link
           href={href}
           className="block rounded px-3 py-2 text-gray-700 hover:bg-blue-50 hover:text-blue-600 focus:outline-none"
         >

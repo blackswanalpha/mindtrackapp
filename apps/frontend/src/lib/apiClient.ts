@@ -31,6 +31,10 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // TEMPORARY: Disable authentication redirect
+    console.log('Authentication error:', error);
+
+    /*
     // Handle authentication errors
     if (error.response && error.response.status === 401) {
       // Clear token and redirect to login if not already there
@@ -53,6 +57,7 @@ apiClient.interceptors.response.use(
         }
       }
     }
+    */
 
     return Promise.reject(error);
   }

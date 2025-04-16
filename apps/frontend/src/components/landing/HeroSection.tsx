@@ -86,13 +86,13 @@ const HeroSection: React.FC = () => {
             className="mt-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
             variants={itemVariants}
           >
-            <Link href="/register">
+            <Link href="/dashboard">
               <motion.button
                 className="flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get Started
+                Go to Dashboard
                 <ArrowRight className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>

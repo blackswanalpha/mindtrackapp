@@ -50,6 +50,17 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
   // Get user data from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
+      // TEMPORARY: Create a mock user for testing
+      const mockUser = {
+        id: 1,
+        name: 'Test User',
+        email: 'test@example.com',
+        role: 'admin'
+      };
+      setUser(mockUser);
+
+      // Original authentication code (commented out)
+      /*
       // Check if user is logged in
       const token = localStorage.getItem('token');
       if (!token) {
@@ -69,6 +80,7 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
           router.push('/login');
         }
       }
+      */
     }
   }, [router]);
 

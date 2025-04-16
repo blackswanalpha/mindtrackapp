@@ -47,13 +47,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     );
   }
 
+  // TEMPORARY: Disable authentication check
+  return <>{children}</>;
+
   // If user is authenticated and has required role, render children
-  if (user && (requiredRoles.length === 0 || requiredRoles.includes(user?.role))) {
-    return <>{children}</>;
-  }
+  // if (user && (requiredRoles.length === 0 || requiredRoles.includes(user?.role))) {
+  //   return <>{children}</>;
+  // }
 
   // Otherwise render nothing
-  return null;
+  // return null;
 };
 
 export default ProtectedRoute;

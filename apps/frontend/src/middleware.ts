@@ -27,7 +27,9 @@ function isProtectedRoute(pathname: string): boolean {
     '/questionnaires/respond',
     '/responses/complete',
     '/responses/view',
-    '/scan'
+    '/scan',
+    '/dashboard',
+    '/google-forms'
   ];
 
   // Check if the path is a public route

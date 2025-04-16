@@ -32,8 +32,8 @@ const CtaSection: React.FC = () => {
 
   const itemVariants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: {
         type: 'spring',
@@ -46,37 +46,37 @@ const CtaSection: React.FC = () => {
   return (
     <section className="py-20 bg-blue-600">
       <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div 
+        <motion.div
           ref={ref}
           initial="hidden"
           animate={controls}
           variants={containerVariants}
           className="max-w-4xl mx-auto text-center"
         >
-          <motion.h2 
+          <motion.h2
             variants={itemVariants}
             className="text-3xl font-bold text-white sm:text-4xl"
           >
             Ready to transform your mental health practice?
           </motion.h2>
-          <motion.p 
+          <motion.p
             variants={itemVariants}
             className="mt-4 text-xl text-blue-100"
           >
             Join thousands of healthcare providers using MindTrack to improve patient outcomes
           </motion.p>
-          
-          <motion.div 
+
+          <motion.div
             variants={itemVariants}
             className="mt-10 flex flex-col sm:flex-row items-center justify-center space-y-4 sm:space-y-0 sm:space-x-4"
           >
-            <Link href="/register">
+            <Link href="/dashboard">
               <motion.button
                 className="flex items-center justify-center rounded-md bg-white px-6 py-3 text-base font-medium text-blue-600 shadow-md hover:bg-blue-50 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-blue-600"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Get Started
+                Go to Dashboard
                 <ArrowRight className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
@@ -90,8 +90,8 @@ const CtaSection: React.FC = () => {
               </motion.button>
             </Link>
           </motion.div>
-          
-          <motion.p 
+
+          <motion.p
             variants={itemVariants}
             className="mt-6 text-sm text-blue-200"
           >
