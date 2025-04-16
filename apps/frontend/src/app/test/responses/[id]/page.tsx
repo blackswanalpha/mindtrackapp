@@ -7,7 +7,7 @@ import { Card, Button, Loading, Alert } from '@/components/common';
 import { ArrowLeft, Download, Mail } from 'lucide-react';
 
 // Mock data for responses
-const RESPONSES = {
+const RESPONSES: Record<string, any> = {
   '1': {
     id: '1',
     questionnaire_id: '1',
@@ -197,27 +197,27 @@ const RESPONSES = {
 const TestResponseDetailPage = () => {
   const { id } = useParams();
   const router = useRouter();
-  
+
   const [response, setResponse] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // Fetch response data
   useEffect(() => {
     const fetchResponse = async () => {
       try {
         setIsLoading(true);
-        
+
         // In a real implementation, this would fetch from the API
         // For now, we'll use our mock data
         const responseData = RESPONSES[id as string];
-        
+
         if (!responseData) {
           setError('Response not found');
           setIsLoading(false);
           return;
         }
-        
+
         setResponse(responseData);
         setIsLoading(false);
       } catch (err) {
@@ -225,12 +225,12 @@ const TestResponseDetailPage = () => {
         setIsLoading(false);
       }
     };
-    
+
     if (id) {
       fetchResponse();
     }
   }, [id]);
-  
+
   // Format date
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -242,17 +242,17 @@ const TestResponseDetailPage = () => {
       minute: '2-digit'
     });
   };
-  
+
   // Export response as PDF (mock function)
   const exportPDF = () => {
     alert('In a real implementation, this would generate a PDF of the response.');
   };
-  
+
   // Send email (mock function)
   const sendEmail = () => {
     alert(`In a real implementation, this would send an email to ${response?.respondent_email}.`);
   };
-  
+
   return (
     <TestLayout>
       <div className="max-w-4xl mx-auto">
@@ -273,7 +273,7 @@ const TestResponseDetailPage = () => {
             <div className="flex justify-between items-start mb-6">
               <div>
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={() => router.push('/test/responses')}
                   className="mb-4"
                 >
@@ -284,17 +284,17 @@ const TestResponseDetailPage = () => {
                 <p className="text-gray-600 mt-1">Response ID: {response.id}</p>
               </div>
               <div className="flex space-x-3">
-                <Button variant="outline" onClick={exportPDF}>
+                <Button variant="secondary" onClick={exportPDF}>
                   <Download className="h-4 w-4 mr-2" />
                   Export PDF
                 </Button>
-                <Button variant="outline" onClick={sendEmail}>
+                <Button variant="secondary" onClick={sendEmail}>
                   <Mail className="h-4 w-4 mr-2" />
                   Email Results
                 </Button>
               </div>
             </div>
-            
+
             <Card className="p-6 mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Response Details</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
@@ -322,7 +322,7 @@ const TestResponseDetailPage = () => {
                 </div>
               </div>
             </Card>
-            
+
             <Card className="p-6 mb-6">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">Responses</h2>
               <div className="space-y-6">
@@ -334,7 +334,7 @@ const TestResponseDetailPage = () => {
                 ))}
               </div>
             </Card>
-            
+
             <div className="text-sm text-gray-500">
               <p>
                 This response is stored in the testresponse table for demonstration purposes.

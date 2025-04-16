@@ -7,7 +7,7 @@ import { Card, Button, Loading, Alert } from '@/components/common';
 import { ChevronLeft, ChevronRight, Send, AlertCircle, CheckCircle } from 'lucide-react';
 
 // Mock data for the questionnaires
-const QUESTIONNAIRES = {
+const QUESTIONNAIRES: Record<string, any> = {
   '1': {
     id: '1',
     title: 'Mental Health Assessment',
@@ -181,7 +181,7 @@ const TestQuestionnaireDetailPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const uniqueCode = searchParams.get('code');
-  
+
   const [questionnaire, setQuestionnaire] = useState<any>(null);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, any>>({});
@@ -189,44 +189,44 @@ const TestQuestionnaireDetailPage = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [submitted, setSubmitted] = useState(false);
-  
+
   // Fetch questionnaire data
   useEffect(() => {
     const fetchQuestionnaire = async () => {
       try {
         setIsLoading(true);
-        
+
         // In a real implementation, this would fetch from the API
         // For now, we'll use our mock data
         const questionnaireData = QUESTIONNAIRES[id as string];
-        
+
         if (!questionnaireData) {
           setError('Questionnaire not found');
           setIsLoading(false);
           return;
         }
-        
+
         setQuestionnaire(questionnaireData);
-        
+
         // Initialize answers object
         const initialAnswers: Record<string, any> = {};
         questionnaireData.questions.forEach((question: any) => {
           initialAnswers[question.id] = '';
         });
         setAnswers(initialAnswers);
-        
+
         setIsLoading(false);
       } catch (err) {
         setError('Failed to load questionnaire');
         setIsLoading(false);
       }
     };
-    
+
     if (id) {
       fetchQuestionnaire();
     }
   }, [id]);
-  
+
   // Handle answer changes
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers(prev => ({
@@ -234,49 +234,49 @@ const TestQuestionnaireDetailPage = () => {
       [questionId]: value
     }));
   };
-  
+
   // Navigate to next question
   const handleNext = () => {
     if (currentQuestionIndex < questionnaire.questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
     }
   };
-  
+
   // Navigate to previous question
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
     }
   };
-  
+
   // Check if current question is answered and required
   const isCurrentQuestionAnswered = () => {
     if (!questionnaire) return true;
-    
+
     const currentQuestion = questionnaire.questions[currentQuestionIndex];
     if (!currentQuestion.required) return true;
-    
+
     const answer = answers[currentQuestion.id];
     return answer !== undefined && answer !== '';
   };
-  
+
   // Check if all required questions are answered
   const areAllRequiredQuestionsAnswered = () => {
     if (!questionnaire) return false;
-    
+
     return questionnaire.questions.every((question: any) => {
       if (!question.required) return true;
       const answer = answers[question.id];
       return answer !== undefined && answer !== '';
     });
   };
-  
+
   // Handle form submission
   const handleSubmit = async () => {
     try {
       setIsSubmitting(true);
       setError(null);
-      
+
       // In a real implementation, this would send data to the API
       // For now, we'll just simulate a submission
       console.log('Submitting answers:', {
@@ -284,10 +284,10 @@ const TestQuestionnaireDetailPage = () => {
         unique_code: uniqueCode || undefined,
         answers: answers
       });
-      
+
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       setSubmitted(true);
       setIsSubmitting(false);
     } catch (err) {
@@ -295,20 +295,20 @@ const TestQuestionnaireDetailPage = () => {
       setIsSubmitting(false);
     }
   };
-  
+
   // Render the current question
   const renderQuestion = () => {
     if (!questionnaire) return null;
-    
+
     const currentQuestion = questionnaire.questions[currentQuestionIndex];
-    
+
     return (
       <div className="mb-8">
         <h3 className="text-lg font-medium text-gray-900 mb-2">
           {currentQuestion.required && <span className="text-red-500 mr-1">*</span>}
           {currentQuestion.text}
         </h3>
-        
+
         {currentQuestion.type === 'text' && (
           <textarea
             value={answers[currentQuestion.id] || ''}
@@ -319,7 +319,7 @@ const TestQuestionnaireDetailPage = () => {
             required={currentQuestion.required}
           />
         )}
-        
+
         {currentQuestion.type === 'email' && (
           <input
             type="email"
@@ -330,7 +330,7 @@ const TestQuestionnaireDetailPage = () => {
             required={currentQuestion.required}
           />
         )}
-        
+
         {currentQuestion.type === 'single_choice' && (
           <div className="space-y-3 mt-3">
             {currentQuestion.options.map((option: string, index: number) => (
@@ -355,7 +355,7 @@ const TestQuestionnaireDetailPage = () => {
       </div>
     );
   };
-  
+
   // Render the success message after submission
   const renderSuccessMessage = () => {
     return (
@@ -375,7 +375,7 @@ const TestQuestionnaireDetailPage = () => {
             View All Questionnaires
           </Button>
           <Button
-            variant="outline"
+            variant="secondary"
             onClick={() => router.push('/test')}
           >
             Back to Test Home
@@ -384,7 +384,7 @@ const TestQuestionnaireDetailPage = () => {
       </div>
     );
   };
-  
+
   return (
     <TestLayout>
       <div className="max-w-3xl mx-auto">
@@ -407,14 +407,14 @@ const TestQuestionnaireDetailPage = () => {
             <div className="mb-6">
               <h1 className="text-2xl font-bold text-gray-900">{questionnaire.title}</h1>
               <p className="text-gray-600 mt-2">{questionnaire.description}</p>
-              
+
               {uniqueCode && (
                 <div className="mt-2 text-sm text-blue-600">
                   Unique code: {uniqueCode}
                 </div>
               )}
             </div>
-            
+
             <Card className="p-6 mb-6">
               <div className="flex justify-between items-center mb-4">
                 <div className="text-sm text-gray-500">
@@ -424,26 +424,26 @@ const TestQuestionnaireDetailPage = () => {
                   {Math.round(((currentQuestionIndex + 1) / questionnaire.questions.length) * 100)}% Complete
                 </div>
               </div>
-              
+
               <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
-                <div 
-                  className="bg-blue-600 h-2 rounded-full" 
+                <div
+                  className="bg-blue-600 h-2 rounded-full"
                   style={{ width: `${((currentQuestionIndex + 1) / questionnaire.questions.length) * 100}%` }}
                 ></div>
               </div>
-              
+
               {renderQuestion()}
-              
+
               <div className="flex justify-between mt-8">
                 <Button
-                  variant="outline"
+                  variant="secondary"
                   onClick={handlePrevious}
                   disabled={currentQuestionIndex === 0}
                 >
                   <ChevronLeft className="h-4 w-4 mr-2" />
                   Previous
                 </Button>
-                
+
                 {currentQuestionIndex < questionnaire.questions.length - 1 ? (
                   <Button
                     variant="primary"
@@ -466,7 +466,7 @@ const TestQuestionnaireDetailPage = () => {
                 )}
               </div>
             </Card>
-            
+
             <div className="text-sm text-gray-500 flex items-start">
               <AlertCircle className="h-4 w-4 mr-2 mt-0.5 flex-shrink-0" />
               <p>

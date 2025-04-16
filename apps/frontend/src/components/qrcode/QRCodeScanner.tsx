@@ -19,24 +19,24 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const [hasCamera, setHasCamera] = useState<boolean>(true);
   const router = useRouter();
   const { showToast } = useToast();
-  
+
   // Start scanning when component mounts
   useEffect(() => {
     if (isScanning) {
       startScanner();
     }
-    
+
     return () => {
       stopScanner();
     };
   }, [isScanning]);
-  
+
   // Start QR code scanner
   const startScanner = async () => {
     try {
       // Dynamically import the QR scanner library
       const { Html5QrcodeScanner } = await import('html5-qrcode');
-      
+
       // Create scanner instance
       const scanner = new Html5QrcodeScanner(
         'qr-reader',
@@ -44,14 +44,14 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
           fps: 10,
           qrbox: 250,
           aspectRatio: 1.0,
-          formatsToSupport: ['QR_CODE']
+          formatsToSupport: [0] // 0 corresponds to QR_CODE in Html5QrcodeSupportedFormats
         },
         false
       );
-      
+
       // Start scanning
       scanner.render(onScanSuccess, onScanFailure);
-      
+
       // Store scanner instance in window for cleanup
       window.qrScanner = scanner;
     } catch (error) {
@@ -61,7 +61,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       setIsScanning(false);
     }
   };
-  
+
   // Stop QR code scanner
   const stopScanner = () => {
     if (window.qrScanner) {
@@ -72,20 +72,20 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       }
     }
   };
-  
+
   // Handle successful scan
   const onScanSuccess = (decodedText: string) => {
     // Stop scanner
     stopScanner();
     setIsScanning(false);
-    
+
     // Check if URL is valid
     try {
       const url = new URL(decodedText);
-      
+
       // Extract path from URL
       const path = url.pathname;
-      
+
       // Check if path is for questionnaire or response
       if (path.includes('/questionnaires/respond/')) {
         const questionnaireId = path.split('/').pop();
@@ -122,17 +122,17 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       }
     }
   };
-  
+
   // Handle scan failure
   const onScanFailure = (error: any) => {
     // Don't show errors for normal scanning failures
     if (error && error.toString().includes('No QR code found')) {
       return;
     }
-    
+
     console.error('QR scan error:', error);
   };
-  
+
   // Toggle scanner
   const toggleScanner = () => {
     if (isScanning) {
@@ -141,7 +141,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
     setIsScanning(!isScanning);
     setError('');
   };
-  
+
   return (
     <Card
       title="QR Code Scanner"
@@ -168,9 +168,9 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
                 </p>
               </div>
             )}
-            
+
             {error && <div className="text-red-500 text-center p-2">{error}</div>}
-            
+
             <Button
               variant={isScanning ? 'danger' : 'primary'}
               className="mt-4"

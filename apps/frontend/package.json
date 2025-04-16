@@ -4,7 +4,8 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node build.js",
+    "build:next": "next build",
     "start": "next start",
     "lint": "next lint"
   },
@@ -20,6 +21,7 @@
     "lucide-react": "^0.488.0",
     "next": "15.3.0",
     "qrcode": "^1.5.3",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-intersection-observer": "^9.16.0"

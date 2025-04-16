@@ -38,7 +38,7 @@ const TestQuestionnairesPage = () => {
             created_at: '2023-04-16T14:45:00Z'
           }
         ];
-        
+
         setQuestionnaires(mockQuestionnaires);
         setIsLoading(false);
       } catch (err) {
@@ -72,9 +72,9 @@ const TestQuestionnairesPage = () => {
             </Button>
           </Link>
         </div>
-        
+
         {error && <Alert type="error" message={error} className="mb-6" />}
-        
+
         {isLoading ? (
           <Loading size="large" message="Loading questionnaires..." />
         ) : questionnaires.length === 0 ? (
@@ -89,7 +89,7 @@ const TestQuestionnairesPage = () => {
                   <div className="flex-1">
                     <h2 className="text-xl font-semibold text-gray-900">{questionnaire.title}</h2>
                     <p className="mt-2 text-gray-600">{questionnaire.description}</p>
-                    
+
                     <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                       <div>
                         <span className="text-gray-500">Questions:</span>{' '}
@@ -104,9 +104,9 @@ const TestQuestionnairesPage = () => {
                         <span className="font-medium">{formatDate(questionnaire.created_at)}</span>
                       </div>
                       <div>
-                        <a 
-                          href={questionnaire.source_url} 
-                          target="_blank" 
+                        <a
+                          href={questionnaire.source_url}
+                          target="_blank"
                           rel="noopener noreferrer"
                           className="text-blue-600 hover:text-blue-800 inline-flex items-center"
                         >
@@ -116,7 +116,7 @@ const TestQuestionnairesPage = () => {
                       </div>
                     </div>
                   </div>
-                  
+
                   <div className="mt-4 md:mt-0 md:ml-6 flex flex-col space-y-2">
                     <Link href={`/test/questionnaires/${questionnaire.id}`}>
                       <Button variant="primary" className="w-full md:w-auto">
@@ -125,7 +125,7 @@ const TestQuestionnairesPage = () => {
                       </Button>
                     </Link>
                     <Link href={`/test/generate?id=${questionnaire.id}`}>
-                      <Button variant="outline" className="w-full md:w-auto">
+                      <Button variant="secondary" className="w-full md:w-auto">
                         <QrCode className="h-4 w-4 mr-2" />
                         Generate QR
                       </Button>
@@ -136,7 +136,7 @@ const TestQuestionnairesPage = () => {
             ))}
           </div>
         )}
-        
+
         <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-blue-800 mb-2">About These Questionnaires</h3>
           <p className="text-blue-700">

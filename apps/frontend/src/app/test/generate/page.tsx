@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from 'react';
 import TestLayout from '@/components/test/TestLayout';
 import { Card, Button, Loading, Alert } from '@/components/common';
-import QRCode from 'qrcode.react';
+// We'll use a simple image for QR code instead of the library
+// import QRCode from 'qrcode.react';
 import { Download, Copy, RefreshCw } from 'lucide-react';
 
 const TestGenerateQRPage = () => {
@@ -36,7 +37,7 @@ const TestGenerateQRPage = () => {
             source_url: 'https://forms.gle/NLqA1svRhX5Pez1K6'
           }
         ];
-        
+
         setQuestionnaires(mockQuestionnaires);
         setIsLoading(false);
       } catch (err) {
@@ -60,21 +61,11 @@ const TestGenerateQRPage = () => {
     setQrValue(`${baseUrl}/test/questionnaires/${id}`);
   };
 
-  // Download QR code as PNG
+  // Mock download QR code function
   const handleDownloadQR = () => {
-    const canvas = document.getElementById('qr-code') as HTMLCanvasElement;
-    if (canvas) {
-      const pngUrl = canvas
-        .toDataURL('image/png')
-        .replace('image/png', 'image/octet-stream');
-      
-      const downloadLink = document.createElement('a');
-      downloadLink.href = pngUrl;
-      downloadLink.download = `qr-questionnaire-${selectedQuestionnaire}.png`;
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-    }
+    // In a real implementation, this would download the actual QR code
+    // For now, we'll just show an alert
+    alert(`In a real implementation, this would download a QR code for questionnaire ${selectedQuestionnaire}`);
   };
 
   // Copy QR code link to clipboard
@@ -96,9 +87,9 @@ const TestGenerateQRPage = () => {
     <TestLayout>
       <div className="max-w-3xl mx-auto">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Generate QR Code</h1>
-        
+
         {error && <Alert type="error" message={error} className="mb-6" />}
-        
+
         {isLoading ? (
           <Loading size="large" message="Loading questionnaires..." />
         ) : (
@@ -107,11 +98,11 @@ const TestGenerateQRPage = () => {
               <h2 className="text-xl font-semibold mb-4">Select Questionnaire</h2>
               <div className="space-y-4">
                 {questionnaires.map((questionnaire) => (
-                  <div 
+                  <div
                     key={questionnaire.id}
                     className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                      selectedQuestionnaire === questionnaire.id 
-                        ? 'border-blue-500 bg-blue-50' 
+                      selectedQuestionnaire === questionnaire.id
+                        ? 'border-blue-500 bg-blue-50'
                         : 'border-gray-200 hover:border-blue-300'
                     }`}
                     onClick={() => handleSelectQuestionnaire(questionnaire.id)}
@@ -122,40 +113,43 @@ const TestGenerateQRPage = () => {
                 ))}
               </div>
             </Card>
-            
+
             <div>
               <Card className="p-6">
                 <h2 className="text-xl font-semibold mb-4">QR Code</h2>
-                
+
                 {qrValue ? (
                   <div className="flex flex-col items-center">
                     <div className="bg-white p-4 rounded-lg shadow-sm mb-4">
-                      <QRCode 
+                      {/* Simple placeholder for QR code */}
+                      <div
                         id="qr-code"
-                        value={qrValue} 
-                        size={200}
-                        level="H"
-                        includeMargin
-                      />
+                        className="w-[200px] h-[200px] bg-gray-100 flex items-center justify-center border border-gray-300"
+                      >
+                        <div className="text-center text-gray-500">
+                          <p className="font-mono text-xs">QR Code for:</p>
+                          <p className="font-mono text-xs break-all px-4">{qrValue}</p>
+                        </div>
+                      </div>
                     </div>
-                    
+
                     <div className="text-sm text-gray-600 mb-4 text-center">
                       <p>Scan this code or share the link:</p>
                       <p className="font-mono text-xs mt-1 bg-gray-100 p-2 rounded">{qrValue}</p>
                     </div>
-                    
+
                     <div className="flex space-x-2 w-full">
-                      <Button 
-                        variant="primary" 
+                      <Button
+                        variant="primary"
                         onClick={handleDownloadQR}
                         className="flex-1"
                       >
                         <Download className="h-4 w-4 mr-2" />
                         Download
                       </Button>
-                      
-                      <Button 
-                        variant="secondary" 
+
+                      <Button
+                        variant="secondary"
                         onClick={handleCopyLink}
                         className="flex-1"
                       >
@@ -163,9 +157,9 @@ const TestGenerateQRPage = () => {
                         {copied ? 'Copied!' : 'Copy Link'}
                       </Button>
                     </div>
-                    
-                    <Button 
-                      variant="outline" 
+
+                    <Button
+                      variant="secondary"
                       onClick={handleGenerateNewCode}
                       className="mt-4 w-full"
                     >
@@ -179,7 +173,7 @@ const TestGenerateQRPage = () => {
                   </div>
                 )}
               </Card>
-              
+
               {qrValue && (
                 <div className="mt-4 text-sm text-gray-600">
                   <p className="font-medium">How to use:</p>

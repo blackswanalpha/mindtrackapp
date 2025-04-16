@@ -71,18 +71,15 @@ const GoogleFormsPage = () => {
   const columns = [
     {
       header: 'Respondent',
-      accessor: 'respondent_email',
-      cell: (row: any) => row.respondent_email || 'Anonymous'
+      accessor: (row: any) => row.respondent_email || 'Anonymous'
     },
     {
       header: 'Submitted At',
-      accessor: 'created_at',
-      cell: (row: any) => formatDate(row.created_at)
+      accessor: (row: any) => formatDate(row.created_at)
     },
     {
       header: 'Actions',
-      accessor: 'id',
-      cell: (row: any) => (
+      accessor: (row: any) => (
         <Button
           variant="secondary"
           size="small"
@@ -145,10 +142,7 @@ const GoogleFormsPage = () => {
           <Table
             data={responses}
             columns={columns}
-            pagination={{
-              totalItems: responses.length,
-              itemsPerPage: 10
-            }}
+            keyField="id"
           />
         )}
       </div>

@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { Card, Button, Loading, Alert } from '@/components/common';
 // Remove ProtectedRoute as authentication is disabled
+// // Authentication is disabled - no need for ProtectedRoute
 // import { ProtectedRoute } from '@/components/auth';
 import { apiClient } from '@/lib/apiClient';
 import { handleApiError } from '@/utils/errorHandler';
@@ -66,18 +67,18 @@ const ResponseDetailPage = () => {
   // Render loading state
   if (isLoading) {
     return (
-      <ProtectedRoute requiredRoles={['admin', 'provider']}>
+      <>
         <div className="container mx-auto px-4 py-8">
           <Loading size="large" message="Loading response details..." />
         </div>
-      </ProtectedRoute>
+      </>
     );
   }
 
   // Render error state
   if (error) {
     return (
-      <ProtectedRoute requiredRoles={['admin', 'provider']}>
+      <>
         <div className="container mx-auto px-4 py-8">
           <Alert type="error" message={error} />
           <Button
@@ -88,14 +89,14 @@ const ResponseDetailPage = () => {
             Back to Responses
           </Button>
         </div>
-      </ProtectedRoute>
+      </>
     );
   }
 
   // Render response not found
   if (!response) {
     return (
-      <ProtectedRoute requiredRoles={['admin', 'provider']}>
+      <>
         <div className="container mx-auto px-4 py-8">
           <Card>
             <p className="text-center text-gray-500 py-8">
@@ -110,7 +111,7 @@ const ResponseDetailPage = () => {
             </Button>
           </Card>
         </div>
-      </ProtectedRoute>
+      </>
     );
   }
 
@@ -119,7 +120,7 @@ const ResponseDetailPage = () => {
   const answers = formData?.answers || {};
 
   return (
-    <ProtectedRoute requiredRoles={['admin', 'provider']}>
+    <>
       <div className="container mx-auto px-4 py-8 max-w-3xl">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-2xl font-bold">Response Details</h1>
@@ -155,7 +156,7 @@ const ResponseDetailPage = () => {
           </div>
         </Card>
       </div>
-    </ProtectedRoute>
+    </>
   );
 };
 

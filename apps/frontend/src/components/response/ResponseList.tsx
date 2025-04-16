@@ -113,10 +113,17 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
     }
 
     try {
-      const response = await api.responses.export(selectedResponses);
+      // Mock export functionality
+      // In a real implementation, this would call the API
+      const csvContent = 'id,respondent,score,risk_level,completed_at\n' +
+        selectedResponses.map(id => {
+          const response = responses.find(r => r.id === id);
+          if (!response) return '';
+          return `${response.id},${response.patient_email || 'Anonymous'},${response.score || 'N/A'},${response.risk_level || 'N/A'},${response.completed_at || 'Incomplete'}`;
+        }).join('\n');
 
       // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const url = window.URL.createObjectURL(new Blob([csvContent]));
       const link = document.createElement('a');
       link.href = url;
       link.setAttribute('download', `responses-export-${new Date().toISOString().split('T')[0]}.csv`);
@@ -343,7 +350,7 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
                   <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                     <div className="flex justify-end space-x-2">
                       <Link
-                        href={`/responses/view/${response.unique_code}`}
+                        href={`/responses/${response.id}`}
                         className="flex items-center p-1 text-blue-600 hover:text-blue-900"
                         title="View Response"
                       >

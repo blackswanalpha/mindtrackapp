@@ -57,7 +57,7 @@ const TestResponsesPage = () => {
             completed: true
           }
         ];
-        
+
         setResponses(mockResponses);
         setIsLoading(false);
       } catch (err) {
@@ -82,8 +82,8 @@ const TestResponsesPage = () => {
   };
 
   // Filter responses
-  const filteredResponses = filter === 'all' 
-    ? responses 
+  const filteredResponses = filter === 'all'
+    ? responses
     : responses.filter(response => response.questionnaire_id === filter);
 
   // Export responses as CSV
@@ -101,7 +101,7 @@ const TestResponsesPage = () => {
         response.completed ? 'Yes' : 'No'
       ].join(','))
     ].join('\n');
-    
+
     // Create download link
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
@@ -117,28 +117,23 @@ const TestResponsesPage = () => {
   const columns = [
     {
       header: 'Questionnaire',
-      accessor: 'questionnaire_title',
-      cell: (row: any) => row.questionnaire_title
+      accessor: (row: any) => row.questionnaire_title
     },
     {
       header: 'Respondent',
-      accessor: 'respondent_email',
-      cell: (row: any) => row.respondent_email
+      accessor: (row: any) => row.respondent_email
     },
     {
       header: 'Code',
-      accessor: 'unique_code',
-      cell: (row: any) => row.unique_code
+      accessor: (row: any) => row.unique_code
     },
     {
       header: 'Submitted',
-      accessor: 'created_at',
-      cell: (row: any) => formatDate(row.created_at)
+      accessor: (row: any) => formatDate(row.created_at)
     },
     {
       header: 'Actions',
-      accessor: 'id',
-      cell: (row: any) => (
+      accessor: (row: any) => (
         <Link href={`/test/responses/${row.id}`}>
           <Button variant="secondary" size="small">
             <FileText className="h-4 w-4 mr-2" />
@@ -167,8 +162,8 @@ const TestResponsesPage = () => {
               </select>
               <Filter className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
             </div>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="secondary"
               onClick={exportCSV}
               disabled={filteredResponses.length === 0}
             >
@@ -177,9 +172,9 @@ const TestResponsesPage = () => {
             </Button>
           </div>
         </div>
-        
+
         {error && <Alert type="error" message={error} className="mb-6" />}
-        
+
         {isLoading ? (
           <Loading size="large" message="Loading responses..." />
         ) : filteredResponses.length === 0 ? (
@@ -191,14 +186,11 @@ const TestResponsesPage = () => {
             <Table
               data={filteredResponses}
               columns={columns}
-              pagination={{
-                totalItems: filteredResponses.length,
-                itemsPerPage: 10
-              }}
+              keyField="id"
             />
           </Card>
         )}
-        
+
         <div className="mt-12 bg-purple-50 border border-purple-200 rounded-lg p-6">
           <h3 className="text-lg font-semibold text-purple-800 mb-2">About Test Responses</h3>
           <p className="text-purple-700">

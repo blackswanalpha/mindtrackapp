@@ -1,36 +1,36 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import DashboardLayout from '@/components/dashboard/DashboardLayout';
 import { Card, Button, Loading, Alert } from '@/components/common';
 import { handleApiError } from '@/utils/errorHandler';
 import { apiClient } from '@/lib/apiClient';
 
-const SendEmailPage = () => {
+const EmailForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const responseIds = searchParams.get('responses')?.split(',').map(Number) || [];
-  
+
   const [recipients, setRecipients] = useState<any[]>([]);
   const [emailTemplates, setEmailTemplates] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isSending, setIsSending] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
   const [success, setSuccess] = useState<string>('');
-  
+
   const [formData, setFormData] = useState({
     subject: '',
     template_id: '',
     custom_message: '',
   });
-  
+
   // Fetch recipients and email templates
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
       setError('');
-      
+
       try {
         // Fetch recipients (responses with email)
         if (responseIds.length > 0) {
@@ -39,11 +39,11 @@ const SendEmailPage = () => {
           });
           setRecipients(recipientsRes.data.recipients);
         }
-        
+
         // Fetch email templates
         const templatesRes = await apiClient.get('/email/templates');
         setEmailTemplates(templatesRes.data.templates);
-        
+
         // Set default template if available
         if (templatesRes.data.templates.length > 0) {
           setFormData(prev => ({
@@ -58,29 +58,29 @@ const SendEmailPage = () => {
         setIsLoading(false);
       }
     };
-    
+
     fetchData();
   }, [responseIds]);
-  
+
   // Handle form input change
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
   };
-  
+
   // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (recipients.length === 0) {
       setError('No recipients selected');
       return;
     }
-    
+
     setIsSending(true);
     setError('');
     setSuccess('');
-    
+
     try {
       // Send email
       await apiClient.post('/email/send', {
@@ -89,9 +89,9 @@ const SendEmailPage = () => {
         template_id: formData.template_id ? Number(formData.template_id) : undefined,
         custom_message: formData.custom_message
       });
-      
+
       setSuccess('Email sent successfully');
-      
+
       // Redirect after a delay
       setTimeout(() => {
         router.push('/responses');
@@ -103,7 +103,7 @@ const SendEmailPage = () => {
       setIsSending(false);
     }
   };
-  
+
   return (
     <DashboardLayout>
       <div className="space-y-6">
@@ -114,7 +114,7 @@ const SendEmailPage = () => {
               Send email to questionnaire respondents
             </p>
           </div>
-          
+
           <Button
             variant="light"
             onClick={() => router.back()}
@@ -122,16 +122,16 @@ const SendEmailPage = () => {
             Cancel
           </Button>
         </div>
-        
+
         {/* Error and Success Alerts */}
         {error && (
           <Alert type="error" message={error} />
         )}
-        
+
         {success && (
           <Alert type="success" message={success} />
         )}
-        
+
         {/* Email Form */}
         <Card>
           {isLoading ? (
@@ -142,7 +142,7 @@ const SendEmailPage = () => {
                 {/* Recipients */}
                 <div>
                   <h2 className="text-lg font-medium text-gray-900 mb-2">Recipients</h2>
-                  
+
                   {recipients.length === 0 ? (
                     <Alert
                       type="warning"
@@ -166,7 +166,7 @@ const SendEmailPage = () => {
                     </div>
                   )}
                 </div>
-                
+
                 {/* Email Subject */}
                 <div>
                   <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
@@ -182,7 +182,7 @@ const SendEmailPage = () => {
                     required
                   />
                 </div>
-                
+
                 {/* Email Template */}
                 <div>
                   <label htmlFor="template_id" className="block text-sm font-medium text-gray-700 mb-1">
@@ -203,7 +203,7 @@ const SendEmailPage = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 {/* Custom Message */}
                 <div>
                   <label htmlFor="custom_message" className="block text-sm font-medium text-gray-700 mb-1">
@@ -219,7 +219,7 @@ const SendEmailPage = () => {
                     placeholder="Enter a custom message to include in the email..."
                   />
                 </div>
-                
+
                 {/* Submit Button */}
                 <div className="flex justify-end">
                   <Button
@@ -237,6 +237,14 @@ const SendEmailPage = () => {
         </Card>
       </div>
     </DashboardLayout>
+  );
+};
+
+const SendEmailPage = () => {
+  return (
+    <Suspense fallback={<Loading size="large" message="Loading..." />}>
+      <EmailForm />
+    </Suspense>
   );
 };
 

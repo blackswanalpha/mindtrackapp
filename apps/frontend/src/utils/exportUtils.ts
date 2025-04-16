@@ -15,43 +15,43 @@ export const convertToCSV = (
   if (!data || !data.length || !columns || !columns.length) {
     return '';
   }
-  
+
   // Create header row
   const headerRow = columns.map(column => `"${column.header}"`).join(',');
-  
+
   // Create data rows
   const dataRows = data.map(item => {
     return columns
       .map(column => {
         const value = item[column.key];
-        
+
         // Handle different value types
         if (value === null || value === undefined) {
           return '""';
         }
-        
+
         if (typeof value === 'string') {
           // Escape quotes in strings
           return `"${value.replace(/"/g, '""')}"`;
         }
-        
+
         if (typeof value === 'object') {
           if (value instanceof Date) {
             return `"${value.toISOString()}"`;
           }
-          
+
           try {
             return `"${JSON.stringify(value).replace(/"/g, '""')}"`;
           } catch (error) {
             return '""';
           }
         }
-        
+
         return `"${value}"`;
       })
       .join(',');
   });
-  
+
   // Combine header and data rows
   return [headerRow, ...dataRows].join('\n');
 };
@@ -69,17 +69,17 @@ export const downloadCSV = (
 ): void => {
   // Convert data to CSV
   const csv = convertToCSV(data, columns);
-  
+
   // Create blob and download link
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
-  
+
   // Set link properties
   link.setAttribute('href', url);
   link.setAttribute('download', `${filename}.csv`);
   link.style.visibility = 'hidden';
-  
+
   // Trigger download
   document.body.appendChild(link);
   link.click();
@@ -100,7 +100,7 @@ export const exportResponsesToCSV = (
   if (!responses || !responses.length) {
     return;
   }
-  
+
   let columns = [
     { key: 'id', header: 'ID' },
     { key: 'questionnaire_id', header: 'Questionnaire ID' },
@@ -114,25 +114,25 @@ export const exportResponsesToCSV = (
     { key: 'completed_at', header: 'Completed At' },
     { key: 'created_at', header: 'Created At' }
   ];
-  
+
   let data = responses.map(response => {
     const result = { ...response };
-    
+
     // Format boolean values
     result.flagged_for_review = response.flagged_for_review ? 'Yes' : 'No';
-    
+
     // Format dates
     if (response.completed_at) {
       result.completed_at = new Date(response.completed_at).toISOString();
     }
-    
+
     if (response.created_at) {
       result.created_at = new Date(response.created_at).toISOString();
     }
-    
+
     return result;
   });
-  
+
   // Include answers if requested
   if (includeAnswers && responses[0]?.answers) {
     // Flatten responses with answers
@@ -140,15 +140,15 @@ export const exportResponsesToCSV = (
       if (!response.answers || !response.answers.length) {
         return [{ ...response, question_id: '', question_text: '', answer_value: '' }];
       }
-      
-      return response.answers.map(answer => ({
+
+      return response.answers.map((answer: any) => ({
         ...response,
         question_id: answer.question_id,
         question_text: answer.question?.text || '',
         answer_value: answer.value
       }));
     });
-    
+
     // Add answer columns
     columns = [
       ...columns,
@@ -157,7 +157,7 @@ export const exportResponsesToCSV = (
       { key: 'answer_value', header: 'Answer' }
     ];
   }
-  
+
   // Download CSV
   downloadCSV(data, columns, filename);
 };
@@ -174,7 +174,7 @@ export const exportQuestionnairesToCSV = (
   if (!questionnaires || !questionnaires.length) {
     return;
   }
-  
+
   const columns = [
     { key: 'id', header: 'ID' },
     { key: 'title', header: 'Title' },
@@ -188,23 +188,23 @@ export const exportQuestionnairesToCSV = (
     { key: 'created_at', header: 'Created At' },
     { key: 'created_by_id', header: 'Created By ID' }
   ];
-  
+
   const data = questionnaires.map(questionnaire => {
     const result = { ...questionnaire };
-    
+
     // Format boolean values
     result.is_active = questionnaire.is_active ? 'Yes' : 'No';
     result.is_public = questionnaire.is_public ? 'Yes' : 'No';
     result.is_template = questionnaire.is_template ? 'Yes' : 'No';
-    
+
     // Format dates
     if (questionnaire.created_at) {
       result.created_at = new Date(questionnaire.created_at).toISOString();
     }
-    
+
     return result;
   });
-  
+
   // Download CSV
   downloadCSV(data, columns, filename);
 };
