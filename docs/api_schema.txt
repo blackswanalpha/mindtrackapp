@@ -1,0 +1,969 @@
+# AdminDashboardPro API Schema Documentation
+
+## Overview
+This document outlines the API endpoints available in the AdminDashboardPro application. The API follows RESTful principles and uses JSON for data exchange.
+
+## Base URL
+- Development: `http://localhost:5000/api`
+- Production: `https://admin-dashboard-pro-api.vercel.app/api`
+
+## Authentication
+Most endpoints require authentication using JWT (JSON Web Tokens).
+
+### Headers
+```
+Authorization: Bearer {token}
+```
+
+## API Endpoints
+
+### Authentication
+
+#### POST /users/login
+Authenticates a user and returns a JWT token.
+
+**Request Body:**
+```json
+{
+  "email": "string",
+  "password": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "token": "string",
+  "user": {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "role": "string"
+  }
+}
+```
+
+#### POST /users/register
+Registers a new user.
+
+**Request Body:**
+```json
+{
+  "name": "string",
+  "email": "string",
+  "password": "string",
+  "role": "string"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "token": "string",
+  "user": {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "role": "string"
+  }
+}
+```
+
+#### GET /users/profile
+Returns the profile of the authenticated user.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "role": "string"
+}
+```
+
+### Users
+
+#### GET /users
+Returns a list of all users (admin only).
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "name": "string",
+    "email": "string",
+    "role": "string",
+    "created_at": "string"
+  }
+]
+```
+
+#### GET /users/:id
+Returns a specific user by ID.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "role": "string",
+  "created_at": "string"
+}
+```
+
+#### PUT /users/:id
+Updates a user.
+
+**Request Body:**
+```json
+{
+  "name": "string",
+  "email": "string",
+  "role": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "email": "string",
+  "role": "string",
+  "updated_at": "string"
+}
+```
+
+#### DELETE /users/:id
+Deletes a user.
+
+**Response (200 OK):**
+```json
+{
+  "message": "User deleted successfully"
+}
+```
+
+### Questionnaires
+
+#### GET /questionnaires
+Returns a list of all questionnaires.
+
+**Query Parameters:**
+- `category` (optional): Filter by category
+- `type` (optional): Filter by type
+- `is_active` (optional): Filter by active status
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "title": "string",
+    "description": "string",
+    "type": "string",
+    "category": "string",
+    "estimated_time": "number",
+    "is_active": "boolean",
+    "is_adaptive": "boolean",
+    "is_qr_enabled": "boolean",
+    "is_template": "boolean",
+    "is_public": "boolean",
+    "allow_anonymous": "boolean",
+    "requires_auth": "boolean",
+    "max_responses": "number",
+    "expires_at": "string",
+    "version": "number",
+    "parent_id": "string",
+    "tags": "array",
+    "organization_id": "string",
+    "created_by_id": "string",
+    "created_at": "string",
+    "updated_at": "string"
+  }
+]
+```
+
+#### GET /questionnaires/:id
+Returns a specific questionnaire by ID.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "version": "number",
+  "parent_id": "string",
+  "tags": "array",
+  "organization_id": "string",
+  "created_by_id": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### POST /questionnaires
+Creates a new questionnaire.
+
+**Request Body:**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "organization_id": "string"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "version": "number",
+  "parent_id": "string",
+  "tags": "array",
+  "organization_id": "string",
+  "created_by_id": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### PUT /questionnaires/:id
+Updates a questionnaire.
+
+**Request Body:**
+```json
+{
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "organization_id": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "version": "number",
+  "parent_id": "string",
+  "tags": "array",
+  "organization_id": "string",
+  "created_by_id": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### DELETE /questionnaires/:id
+Deletes a questionnaire.
+
+**Response (200 OK):**
+```json
+{
+  "message": "Questionnaire deleted successfully"
+}
+```
+
+#### GET /questionnaires/:id/with-questions
+Returns a questionnaire with its questions.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "title": "string",
+  "description": "string",
+  "type": "string",
+  "category": "string",
+  "estimated_time": "number",
+  "is_active": "boolean",
+  "is_adaptive": "boolean",
+  "is_qr_enabled": "boolean",
+  "is_template": "boolean",
+  "is_public": "boolean",
+  "allow_anonymous": "boolean",
+  "requires_auth": "boolean",
+  "max_responses": "number",
+  "expires_at": "string",
+  "version": "number",
+  "parent_id": "string",
+  "tags": "array",
+  "organization_id": "string",
+  "created_by_id": "string",
+  "created_at": "string",
+  "updated_at": "string",
+  "questions": [
+    {
+      "id": "string",
+      "questionnaire_id": "string",
+      "text": "string",
+      "type": "string",
+      "required": "boolean",
+      "order_num": "number",
+      "options": "array",
+      "conditional_logic": "object",
+      "created_at": "string",
+      "updated_at": "string"
+    }
+  ]
+}
+```
+
+### Questions
+
+#### GET /questionnaires/:id/questions
+Returns all questions for a questionnaire.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "questionnaire_id": "string",
+    "text": "string",
+    "type": "string",
+    "required": "boolean",
+    "order_num": "number",
+    "options": "array",
+    "conditional_logic": "object",
+    "created_at": "string",
+    "updated_at": "string"
+  }
+]
+```
+
+#### POST /questionnaires/:id/questions
+Creates a new question for a questionnaire.
+
+**Request Body:**
+```json
+{
+  "text": "string",
+  "type": "string",
+  "required": "boolean",
+  "order_num": "number",
+  "options": "array",
+  "conditional_logic": "object"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "questionnaire_id": "string",
+  "text": "string",
+  "type": "string",
+  "required": "boolean",
+  "order_num": "number",
+  "options": "array",
+  "conditional_logic": "object",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### PUT /questions/:id
+Updates a question.
+
+**Request Body:**
+```json
+{
+  "text": "string",
+  "type": "string",
+  "required": "boolean",
+  "order_num": "number",
+  "options": "array",
+  "conditional_logic": "object"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "questionnaire_id": "string",
+  "text": "string",
+  "type": "string",
+  "required": "boolean",
+  "order_num": "number",
+  "options": "array",
+  "conditional_logic": "object",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### DELETE /questions/:id
+Deletes a question.
+
+**Response (200 OK):**
+```json
+{
+  "message": "Question deleted successfully"
+}
+```
+
+### Responses
+
+#### GET /responses
+Returns all responses.
+
+**Query Parameters:**
+- `questionnaireId` (optional): Filter by questionnaire ID
+- `startDate` (optional): Filter by start date
+- `endDate` (optional): Filter by end date
+- `riskLevel` (optional): Filter by risk level
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "questionnaire_id": "string",
+    "patient_identifier": "string",
+    "patient_name": "string",
+    "patient_email": "string",
+    "patient_age": "number",
+    "patient_gender": "string",
+    "score": "number",
+    "risk_level": "string",
+    "flagged_for_review": "boolean",
+    "completion_time": "number",
+    "completed_at": "string",
+    "created_at": "string"
+  }
+]
+```
+
+#### GET /responses/:id
+Returns a specific response by ID.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "questionnaire_id": "string",
+  "patient_identifier": "string",
+  "patient_name": "string",
+  "patient_email": "string",
+  "patient_age": "number",
+  "patient_gender": "string",
+  "score": "number",
+  "risk_level": "string",
+  "flagged_for_review": "boolean",
+  "completion_time": "number",
+  "completed_at": "string",
+  "created_at": "string"
+}
+```
+
+#### POST /responses
+Creates a new response.
+
+**Request Body:**
+```json
+{
+  "questionnaire_id": "string",
+  "patient_identifier": "string",
+  "patient_name": "string",
+  "patient_email": "string",
+  "patient_age": "number",
+  "patient_gender": "string",
+  "score": "number",
+  "risk_level": "string",
+  "flagged_for_review": "boolean",
+  "completion_time": "number",
+  "answers": [
+    {
+      "question_id": "string",
+      "value": "string"
+    }
+  ]
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "questionnaire_id": "string",
+  "patient_identifier": "string",
+  "patient_name": "string",
+  "patient_email": "string",
+  "patient_age": "number",
+  "patient_gender": "string",
+  "score": "number",
+  "risk_level": "string",
+  "flagged_for_review": "boolean",
+  "completion_time": "number",
+  "completed_at": "string",
+  "created_at": "string"
+}
+```
+
+#### PUT /responses/:id
+Updates a response.
+
+**Request Body:**
+```json
+{
+  "patient_identifier": "string",
+  "patient_name": "string",
+  "patient_email": "string",
+  "patient_age": "number",
+  "patient_gender": "string",
+  "score": "number",
+  "risk_level": "string",
+  "flagged_for_review": "boolean"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "questionnaire_id": "string",
+  "patient_identifier": "string",
+  "patient_name": "string",
+  "patient_email": "string",
+  "patient_age": "number",
+  "patient_gender": "string",
+  "score": "number",
+  "risk_level": "string",
+  "flagged_for_review": "boolean",
+  "completion_time": "number",
+  "completed_at": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### DELETE /responses/:id
+Deletes a response.
+
+**Response (200 OK):**
+```json
+{
+  "message": "Response deleted successfully"
+}
+```
+
+#### GET /responses/:id/answers
+Returns all answers for a response.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "response_id": "string",
+    "question_id": "string",
+    "value": "string",
+    "question_text": "string",
+    "question_type": "string",
+    "question_options": "array",
+    "created_at": "string"
+  }
+]
+```
+
+### Organizations
+
+#### GET /organizations
+Returns all organizations.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "name": "string",
+    "description": "string",
+    "type": "string",
+    "contact_email": "string",
+    "contact_phone": "string",
+    "address": "string",
+    "created_at": "string",
+    "updated_at": "string"
+  }
+]
+```
+
+#### GET /organizations/:id
+Returns a specific organization by ID.
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "type": "string",
+  "contact_email": "string",
+  "contact_phone": "string",
+  "address": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### POST /organizations
+Creates a new organization.
+
+**Request Body:**
+```json
+{
+  "name": "string",
+  "description": "string",
+  "type": "string",
+  "contact_email": "string",
+  "contact_phone": "string",
+  "address": "string"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "type": "string",
+  "contact_email": "string",
+  "contact_phone": "string",
+  "address": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### PUT /organizations/:id
+Updates an organization.
+
+**Request Body:**
+```json
+{
+  "name": "string",
+  "description": "string",
+  "type": "string",
+  "contact_email": "string",
+  "contact_phone": "string",
+  "address": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "id": "string",
+  "name": "string",
+  "description": "string",
+  "type": "string",
+  "contact_email": "string",
+  "contact_phone": "string",
+  "address": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+#### DELETE /organizations/:id
+Deletes an organization.
+
+**Response (200 OK):**
+```json
+{
+  "message": "Organization deleted successfully"
+}
+```
+
+#### GET /organizations/:id/members
+Returns all members of an organization.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "organization_id": "string",
+    "user_id": "string",
+    "role": "string",
+    "user": {
+      "id": "string",
+      "name": "string",
+      "email": "string"
+    },
+    "created_at": "string",
+    "updated_at": "string"
+  }
+]
+```
+
+#### POST /organizations/:id/members
+Adds a member to an organization.
+
+**Request Body:**
+```json
+{
+  "user_id": "string",
+  "role": "string"
+}
+```
+
+**Response (201 Created):**
+```json
+{
+  "id": "string",
+  "organization_id": "string",
+  "user_id": "string",
+  "role": "string",
+  "created_at": "string",
+  "updated_at": "string"
+}
+```
+
+### Analytics
+
+#### GET /analytics/dashboard-metrics
+Returns dashboard metrics.
+
+**Response (200 OK):**
+```json
+{
+  "total_questionnaires": "number",
+  "total_responses": "number",
+  "total_users": "number",
+  "total_organizations": "number",
+  "recent_responses": [
+    {
+      "id": "string",
+      "questionnaire_title": "string",
+      "patient_name": "string",
+      "completed_at": "string"
+    }
+  ],
+  "response_distribution": {
+    "minimal": "number",
+    "low": "number",
+    "moderate": "number",
+    "high": "number"
+  }
+}
+```
+
+#### GET /analytics/response-timeline
+Returns response timeline data.
+
+**Query Parameters:**
+- `period` (optional): Time period (day, week, month, year)
+- `questionnaireId` (optional): Filter by questionnaire ID
+
+**Response (200 OK):**
+```json
+[
+  {
+    "date": "string",
+    "count": "number"
+  }
+]
+```
+
+#### GET /analytics/response-distribution
+Returns response distribution data.
+
+**Query Parameters:**
+- `questionnaireId` (optional): Filter by questionnaire ID
+
+**Response (200 OK):**
+```json
+{
+  "risk_levels": {
+    "minimal": "number",
+    "low": "number",
+    "moderate": "number",
+    "high": "number"
+  },
+  "age_groups": {
+    "0-18": "number",
+    "19-35": "number",
+    "36-50": "number",
+    "51-65": "number",
+    "65+": "number"
+  },
+  "genders": {
+    "Male": "number",
+    "Female": "number",
+    "Other": "number",
+    "Prefer not to say": "number"
+  }
+}
+```
+
+### AI Analysis
+
+#### POST /ai/analyze
+Analyzes responses using AI.
+
+**Request Body:**
+```json
+{
+  "response_id": "string",
+  "prompt": "string"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "analysis": "string",
+  "recommendations": "string",
+  "risk_assessment": "string"
+}
+```
+
+### Email
+
+#### POST /email/send
+Sends an email.
+
+**Request Body:**
+```json
+{
+  "to": "string",
+  "subject": "string",
+  "body": "string",
+  "template_id": "string",
+  "template_data": "object"
+}
+```
+
+**Response (200 OK):**
+```json
+{
+  "message": "Email sent successfully",
+  "email_id": "string"
+}
+```
+
+#### GET /email/templates
+Returns all email templates.
+
+**Response (200 OK):**
+```json
+[
+  {
+    "id": "string",
+    "name": "string",
+    "subject": "string",
+    "body": "string",
+    "created_at": "string",
+    "updated_at": "string"
+  }
+]
+```
+
+## Error Responses
+
+### 400 Bad Request
+```json
+{
+  "message": "Invalid request parameters"
+}
+```
+
+### 401 Unauthorized
+```json
+{
+  "message": "Authentication required"
+}
+```
+
+### 403 Forbidden
+```json
+{
+  "message": "You do not have permission to access this resource"
+}
+```
+
+### 404 Not Found
+```json
+{
+  "message": "Resource not found"
+}
+```
+
+### 500 Internal Server Error
+```json
+{
+  "message": "An unexpected error occurred"
+}
+```

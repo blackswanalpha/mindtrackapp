@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>High Risk Response Alert</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #ef4444;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .button {
+      display: inline-block;
+      background-color: #3b82f6;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .alert-box {
+      background-color: #fee2e2;
+      border-left: 4px solid #ef4444;
+      padding: 15px;
+      margin: 20px 0;
+    }
+    .patient-info {
+      background-color: #e5e7eb;
+      padding: 15px;
+      border-radius: 4px;
+      margin: 20px 0;
+    }
+    .patient-info p {
+      margin: 5px 0;
+    }
+    .score-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .score {
+      font-size: 36px;
+      font-weight: bold;
+    }
+    .risk-level {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 10px;
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>High Risk Response Alert</h1>
+    </div>
+    
+    <div class="content">
+      <div class="alert-box">
+        <p><strong>ATTENTION:</strong> A high-risk response has been detected for the {{questionnaire.title}} questionnaire.</p>
+      </div>
+      
+      <p>A patient has submitted a response that has been flagged as high risk. Please review this response as soon as possible.</p>
+      
+      <div class="patient-info">
+        <h3>Patient Information</h3>
+        {{#if patient.name}}
+          <p><strong>Name:</strong> {{patient.name}}</p>
+        {{/if}}
+        {{#if patient.email}}
+          <p><strong>Email:</strong> {{patient.email}}</p>
+        {{/if}}
+        {{#if patient.identifier}}
+          <p><strong>Patient ID:</strong> {{patient.identifier}}</p>
+        {{/if}}
+      </div>
+      
+      <div class="score-container">
+        <p>Response score:</p>
+        <div class="score">{{score}}</div>
+        <div class="risk-level">HIGH RISK</div>
+      </div>
+      
+      <p>Questionnaire: {{questionnaire.title}}</p>
+      <p>Submitted on: {{date}}</p>
+      
+      {{#if viewResponseUrl}}
+        <p style="text-align: center;">
+          <a href="{{viewResponseUrl}}" class="button">View Response Details</a>
+        </p>
+      {{/if}}
+      
+      <p>Please take appropriate action according to your organization's protocols for high-risk responses.</p>
+    </div>
+    
+    <div class="footer">
+      <p>This is an automated alert from MindTrack, a mental health tracking application.</p>
+      <p>Date: {{date}}</p>
+    </div>
+  </div>
+</body>
+</html>

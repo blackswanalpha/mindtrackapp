@@ -13,6 +13,9 @@
     "start": "npm run start --workspace=api"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "autoprefixer": "^10.4.21",
+    "concurrently": "^8.2.2",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.17"
   }
 }

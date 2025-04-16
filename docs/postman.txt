@@ -1,0 +1,233 @@
+# AdminDashboardPro Postman Collection
+
+## Overview
+This document provides instructions for using the Postman collection for testing the AdminDashboardPro API. The collection includes all API endpoints with pre-configured request bodies and environment variables.
+
+## Setup Instructions
+
+### Import Collection
+1. Open Postman
+2. Click on "Import" button in the top left corner
+3. Select "Link" tab
+4. Enter the following URL: `https://www.postman.com/collections/admin-dashboard-pro-api`
+5. Click "Import"
+
+### Set Up Environment
+1. Click on "Environments" in the left sidebar
+2. Click "Add" to create a new environment
+3. Name it "AdminDashboardPro Development"
+4. Add the following variables:
+   - `baseUrl`: `http://localhost:5000/api`
+   - `token`: Leave empty (will be set automatically after login)
+5. Click "Save"
+6. Select the environment from the dropdown in the top right corner
+
+## Collection Structure
+
+The collection is organized into the following folders:
+
+### Authentication
+- Login
+- Register
+- Get Profile
+
+### Users
+- Get All Users
+- Get User by ID
+- Create User
+- Update User
+- Delete User
+
+### Questionnaires
+- Get All Questionnaires
+- Get Questionnaire by ID
+- Create Questionnaire
+- Update Questionnaire
+- Delete Questionnaire
+- Get Questionnaire with Questions
+
+### Questions
+- Get Questions by Questionnaire ID
+- Create Question
+- Update Question
+- Delete Question
+
+### Responses
+- Get All Responses
+- Get Response by ID
+- Create Response
+- Update Response
+- Delete Response
+- Get Answers by Response ID
+
+### Organizations
+- Get All Organizations
+- Get Organization by ID
+- Create Organization
+- Update Organization
+- Delete Organization
+- Get Organization Members
+- Add Organization Member
+
+### Analytics
+- Get Dashboard Metrics
+- Get Response Timeline
+- Get Response Distribution
+
+### AI Analysis
+- Analyze Response
+
+### Email
+- Send Email
+- Get Email Templates
+
+## Using the Collection
+
+### Authentication
+1. Use the "Login" request to authenticate and get a token
+2. The token will be automatically set in the environment variables
+3. All subsequent requests will use this token for authentication
+
+### Testing Endpoints
+1. Select the request you want to test
+2. Review and modify the request body if needed
+3. Click "Send" to execute the request
+4. View the response in the bottom panel
+
+### Request Examples
+
+#### Login
+```json
+{
+  "email": "admin@example.com",
+  "password": "password123"
+}
+```
+
+#### Create Questionnaire
+```json
+{
+  "title": "Health Assessment",
+  "description": "A general health assessment questionnaire",
+  "type": "Standard",
+  "category": "Health",
+  "estimated_time": 10,
+  "is_active": true,
+  "is_adaptive": false,
+  "is_qr_enabled": true,
+  "is_template": false,
+  "is_public": true,
+  "allow_anonymous": true,
+  "requires_auth": false
+}
+```
+
+#### Create Question
+```json
+{
+  "text": "How would you rate your overall health?",
+  "type": "multiple_choice",
+  "required": true,
+  "order_num": 1,
+  "options": ["Poor", "Fair", "Good", "Very Good", "Excellent"]
+}
+```
+
+#### Create Response
+```json
+{
+  "questionnaire_id": "{{questionnaireId}}",
+  "patient_identifier": "PAT123",
+  "patient_name": "John Doe",
+  "patient_email": "john@example.com",
+  "patient_age": 35,
+  "patient_gender": "Male",
+  "score": 75,
+  "risk_level": "Low",
+  "flagged_for_review": false,
+  "completion_time": 300,
+  "answers": [
+    {
+      "question_id": "{{questionId1}}",
+      "value": "Good"
+    },
+    {
+      "question_id": "{{questionId2}}",
+      "value": "No"
+    }
+  ]
+}
+```
+
+## Environment Variables
+
+The collection uses the following environment variables:
+
+- `baseUrl`: The base URL for the API
+- `token`: The authentication token
+- `userId`: ID of a user (set after creating or retrieving a user)
+- `questionnaireId`: ID of a questionnaire (set after creating or retrieving a questionnaire)
+- `questionId`: ID of a question (set after creating or retrieving a question)
+- `responseId`: ID of a response (set after creating or retrieving a response)
+- `organizationId`: ID of an organization (set after creating or retrieving an organization)
+
+## Pre-request Scripts
+
+Many requests include pre-request scripts to:
+1. Check if the token is valid
+2. Set IDs for related resources
+3. Generate random data for testing
+
+## Tests
+
+Each request includes tests to:
+1. Verify the response status code
+2. Validate the response structure
+3. Set environment variables based on the response
+4. Check for error messages
+
+## Workflows
+
+The collection includes the following test workflows:
+
+### Complete Questionnaire Workflow
+1. Login as admin
+2. Create a questionnaire
+3. Add questions to the questionnaire
+4. Generate a QR code
+5. Login as a regular user
+6. Submit a response
+7. View the response as admin
+
+### Organization Management Workflow
+1. Login as admin
+2. Create an organization
+3. Add members to the organization
+4. Create a questionnaire for the organization
+5. View organization metrics
+
+## Troubleshooting
+
+### Authentication Issues
+- Ensure you've run the login request first
+- Check that the token is being set correctly in the environment
+- Verify that the token hasn't expired
+
+### Request Failures
+- Check the request body for correct format
+- Ensure all required fields are included
+- Verify that referenced IDs (e.g., questionnaireId) exist
+- Check the server logs for more detailed error information
+
+### Environment Variable Issues
+- Make sure you've selected the correct environment
+- Check that variables are being set by the pre-request scripts
+- Try resetting the environment and starting from the login request
+
+## Exporting Results
+
+To export test results:
+1. Run a collection or folder using the Collection Runner
+2. Click "Export Results" in the results view
+3. Choose your preferred format (JSON, CSV, HTML)
+4. Save the file to your local system

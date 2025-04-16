@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your {{questionnaire.title}} Results</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      background-color: #3b82f6;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+    .content {
+      padding: 20px;
+      background-color: #f9fafb;
+    }
+    .footer {
+      text-align: center;
+      padding: 20px;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    .button {
+      display: inline-block;
+      background-color: #3b82f6;
+      color: white;
+      text-decoration: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      margin-top: 20px;
+    }
+    .score-container {
+      text-align: center;
+      margin: 20px 0;
+    }
+    .score {
+      font-size: 36px;
+      font-weight: bold;
+    }
+    .risk-level {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 4px;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+    .risk-low {
+      background-color: #d1fae5;
+      color: #047857;
+    }
+    .risk-medium {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    .risk-high {
+      background-color: #fee2e2;
+      color: #b91c1c;
+    }
+    .unique-code {
+      background-color: #e5e7eb;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Your {{questionnaire.title}} Results</h1>
+    </div>
+    
+    <div class="content">
+      <p>Thank you for completing the {{questionnaire.title}} questionnaire.</p>
+      
+      <p>Your unique response code is:</p>
+      <div class="unique-code">{{uniqueCode}}</div>
+      <p>Please save this code for future reference. You can use it to access your results at any time.</p>
+      
+      <div class="score-container">
+        <p>Your score:</p>
+        <div class="score">{{score}}</div>
+        
+        {{#if riskLevel}}
+          <div class="risk-level risk-{{riskLevel}}">
+            {{riskLevel}} RISK
+          </div>
+        {{/if}}
+      </div>
+      
+      {{#if viewResultsUrl}}
+        <p style="text-align: center;">
+          <a href="{{viewResultsUrl}}" class="button">View Detailed Results</a>
+        </p>
+      {{/if}}
+      
+      <p>If you have any questions about your results, please contact your healthcare provider.</p>
+    </div>
+    
+    <div class="footer">
+      <p>This email was sent from MindTrack, a mental health tracking application.</p>
+      <p>Date: {{date}}</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,483 @@
+# MindTrack Project Implementation Reference Guide
+
+## Project Overview
+MindTrack is a full-stack mental health tracking application designed to create, distribute, and analyze mental health questionnaires. The application allows healthcare providers to monitor patient mental health through standardized assessments, with features for questionnaire creation, response collection, analytics, and AI-powered insights.
+
+## Technology Stack
+- **Frontend**: Next.js 15 with App Router, TypeScript, Tailwind CSS
+- **Backend**: Express.js API with Node.js
+- **Database**: PostgreSQL via Neon (cloud-based PostgreSQL)
+- **Deployment**: Vercel for both frontend and API
+- **Repository**: GitHub (username: blackswanalpha)
+- **Branch Strategy**: Use 'master' as the default branch
+
+## Project Structure
+```
+mindtrackapp/
+├── apps/
+│   ├── frontend/         # Next.js frontend application
+│   └── api/              # Express.js API
+├── package.json          # Root package.json for workspace management
+└── vercel.json           # Vercel deployment configuration
+```
+
+## Implementation Phases
+
+### Phase 1: Foundation Setup (COMPLETED)
+- [x] Initialize monorepo structure
+- [x] Set up Next.js frontend
+- [x] Set up Express.js API
+- [x] Configure Vercel deployment
+- [x] Establish basic connectivity between frontend and API
+
+### Phase 2: Authentication System
+- [ ] Implement user model in database
+- [ ] Create authentication API endpoints (register, login, logout)
+- [ ] Set up JWT authentication
+- [ ] Implement authentication middleware
+- [ ] Create frontend authentication forms
+- [ ] Add protected routes in frontend
+- [ ] Implement user session management
+
+### Phase 3: User Management
+- [ ] Implement user roles (admin, healthcare provider, patient)
+- [ ] Create user CRUD API endpoints
+- [ ] Implement user profile management
+- [ ] Add user search and filtering
+- [ ] Create user administration interface
+- [ ] Implement password reset functionality
+- [ ] Add email verification
+
+### Phase 4: Questionnaire Management
+- [ ] Implement questionnaire model in database
+- [ ] Create question model with different question types
+- [ ] Implement questionnaire CRUD API endpoints
+- [ ] Create questionnaire builder interface
+- [ ] Add question type components (multiple choice, text, scale, etc.)
+- [ ] Implement questionnaire versioning
+- [ ] Add questionnaire templates
+- [ ] Create questionnaire preview functionality
+
+### Phase 5: Response Collection
+- [ ] Implement response model in database
+- [ ] Create response collection API endpoints
+- [ ] Build public-facing questionnaire interface
+- [ ] Add progress tracking for multi-page questionnaires
+- [ ] Implement save and resume functionality
+- [ ] Create QR code generation for questionnaire access
+- [ ] Add anonymous response collection
+- [ ] Implement response validation
+
+### Phase 6: Scoring and Analysis
+- [ ] Implement scoring configuration model
+- [ ] Create scoring calculation logic
+- [ ] Add risk level assessment
+- [ ] Implement scoring API endpoints
+- [ ] Create score visualization components
+- [ ] Add comparative analysis features
+- [ ] Implement trend analysis over time
+- [ ] Create scoring rules management interface
+
+### Phase 7: AI Integration
+- [ ] Set up AI analysis model in database
+- [ ] Integrate with AI services (OpenAI, etc.)
+- [ ] Implement prompt engineering for mental health analysis
+- [ ] Create AI analysis API endpoints
+- [ ] Build AI insights visualization
+- [ ] Add recommendation generation
+- [ ] Implement AI analysis request interface
+- [ ] Create AI analysis history and comparison
+
+### Phase 8: Organization Management
+- [ ] Implement organization model in database
+- [ ] Create organization membership model
+- [ ] Add organization CRUD API endpoints
+- [ ] Implement organization management interface
+- [ ] Add member invitation system
+- [ ] Create organization-specific questionnaires
+- [ ] Implement organization analytics dashboard
+- [ ] Add organization settings management
+
+### Phase 9: Analytics and Reporting
+- [ ] Create analytics data aggregation logic
+- [ ] Implement analytics API endpoints
+- [ ] Build analytics dashboard components
+- [ ] Add report generation functionality
+- [ ] Create export options (PDF, CSV)
+- [ ] Implement data visualization components
+- [ ] Add custom report builder
+- [ ] Create scheduled report delivery
+
+### Phase 10: Notifications and Communication
+- [ ] Implement notification model in database
+- [ ] Create email template system
+- [ ] Add notification API endpoints
+- [ ] Build notification center interface
+- [ ] Implement email sending functionality
+- [ ] Add SMS notifications (optional)
+- [ ] Create notification preferences management
+- [ ] Implement reminder system for questionnaires
+
+### Phase 11: Mobile Optimization
+- [ ] Optimize responsive design for all interfaces
+- [ ] Implement mobile-specific UI components
+- [ ] Add offline support for questionnaire completion
+- [ ] Create progressive web app configuration
+- [ ] Optimize performance for mobile devices
+- [ ] Add touch-friendly interactions
+- [ ] Implement mobile notifications
+
+### Phase 12: Advanced Features
+- [ ] Add Google Form import functionality
+- [ ] Implement webhook integration
+- [ ] Create API key management for external integrations
+- [ ] Add custom branding options
+- [ ] Implement multi-language support
+- [ ] Create accessibility enhancements
+- [ ] Add advanced security features
+- [ ] Implement audit logging
+
+## Database Schema Implementation
+
+### Core Tables
+1. **users**
+   - Fields: id, name, email, password, role, profile_image, last_login, created_at, updated_at
+   - Indexes: id (PK), email (unique)
+   - Implementation priority: HIGH (Phase 2)
+
+2. **questionnaires**
+   - Fields: id, title, description, type, category, estimated_time, is_active, is_adaptive, is_qr_enabled, is_template, is_public, allow_anonymous, requires_auth, max_responses, expires_at, version, parent_id, tags, organization_id, created_by_id, created_at, updated_at
+   - Indexes: id (PK), created_by_id (FK), organization_id (FK), is_active, is_public
+   - Implementation priority: HIGH (Phase 4)
+
+3. **questions**
+   - Fields: id, questionnaire_id, text, type, required, order_num, options, conditional_logic, created_at, updated_at
+   - Indexes: id (PK), questionnaire_id (FK)
+   - Implementation priority: HIGH (Phase 4)
+
+4. **responses**
+   - Fields: id, questionnaire_id, user_id, patient_identifier, patient_name, patient_email, patient_age, patient_gender, score, risk_level, flagged_for_review, completion_time, completed_at, organization_id, created_at, updated_at
+   - Indexes: id (PK), questionnaire_id (FK), user_id (FK), organization_id (FK), patient_identifier, patient_email, risk_level, completed_at
+   - Implementation priority: HIGH (Phase 5)
+
+5. **answers**
+   - Fields: id, response_id, question_id, value, created_at, updated_at
+   - Indexes: id (PK), response_id (FK), question_id (FK)
+   - Implementation priority: HIGH (Phase 5)
+
+### Supporting Tables
+6. **organizations**
+   - Fields: id, name, description, type, contact_email, contact_phone, address, logo_url, settings, created_at, updated_at
+   - Indexes: id (PK)
+   - Implementation priority: MEDIUM (Phase 8)
+
+7. **organization_members**
+   - Fields: id, organization_id, user_id, role, created_at, updated_at
+   - Indexes: id (PK), organization_id (FK), user_id (FK)
+   - Implementation priority: MEDIUM (Phase 8)
+
+8. **scoring_configs**
+   - Fields: id, questionnaire_id, name, rules, risk_levels, created_by_id, created_at, updated_at
+   - Indexes: id (PK), questionnaire_id (FK), created_by_id (FK)
+   - Implementation priority: MEDIUM (Phase 6)
+
+9. **ai_analyses**
+   - Fields: id, response_id, prompt, analysis, recommendations, risk_assessment, model_used, created_by_id, created_at
+   - Indexes: id (PK), response_id (FK), created_by_id (FK)
+   - Implementation priority: MEDIUM (Phase 7)
+
+10. **email_templates**
+    - Fields: id, name, subject, body, variables, created_by_id, created_at, updated_at
+    - Indexes: id (PK), created_by_id (FK)
+    - Implementation priority: LOW (Phase 10)
+
+11. **email_logs**
+    - Fields: id, template_id, recipient, subject, body, status, error, sent_by_id, sent_at
+    - Indexes: id (PK), template_id (FK), sent_by_id (FK), recipient, sent_at
+    - Implementation priority: LOW (Phase 10)
+
+12. **sessions**
+    - Fields: id, user_id, ip_address, user_agent, expires_at, created_at
+    - Indexes: id (PK), user_id (FK)
+    - Implementation priority: MEDIUM (Phase 2)
+
+13. **audit_logs**
+    - Fields: id, user_id, action, entity_type, entity_id, details, ip_address, created_at
+    - Indexes: id (PK), user_id (FK), action, created_at
+    - Implementation priority: LOW (Phase 12)
+
+14. **notifications**
+    - Fields: id, user_id, title, message, type, is_read, entity_type, entity_id, created_at
+    - Indexes: id (PK), user_id (FK), is_read, created_at
+    - Implementation priority: MEDIUM (Phase 10)
+
+## API Endpoints Implementation
+
+### Authentication Endpoints
+- POST `/api/auth/register` - Register a new user
+- POST `/api/auth/login` - Authenticate a user
+- POST `/api/auth/logout` - Log out a user
+- GET `/api/auth/me` - Get current user information
+- POST `/api/auth/refresh-token` - Refresh authentication token
+- POST `/api/auth/forgot-password` - Request password reset
+- POST `/api/auth/reset-password` - Reset password with token
+- POST `/api/auth/verify-email` - Verify email address
+
+### User Management Endpoints
+- GET `/api/users` - Get list of users (admin only)
+- GET `/api/users/:id` - Get user details
+- PUT `/api/users/:id` - Update user information
+- DELETE `/api/users/:id` - Delete a user (admin only)
+- PUT `/api/users/:id/role` - Update user role (admin only)
+- GET `/api/users/:id/activity` - Get user activity log
+
+### Questionnaire Management Endpoints
+- GET `/api/questionnaires` - Get list of questionnaires
+- POST `/api/questionnaires` - Create a new questionnaire
+- GET `/api/questionnaires/:id` - Get questionnaire details
+- PUT `/api/questionnaires/:id` - Update questionnaire
+- DELETE `/api/questionnaires/:id` - Delete questionnaire
+- POST `/api/questionnaires/:id/duplicate` - Duplicate questionnaire
+- GET `/api/questionnaires/:id/questions` - Get questions for questionnaire
+- POST `/api/questionnaires/:id/publish` - Publish questionnaire
+- GET `/api/questionnaires/:id/qr-code` - Generate QR code for questionnaire
+
+### Question Management Endpoints
+- POST `/api/questions` - Create a new question
+- GET `/api/questions/:id` - Get question details
+- PUT `/api/questions/:id` - Update question
+- DELETE `/api/questions/:id` - Delete question
+- PUT `/api/questions/reorder` - Reorder questions
+
+### Response Collection Endpoints
+- POST `/api/responses` - Submit a questionnaire response
+- GET `/api/responses` - Get list of responses (filtered by permissions)
+- GET `/api/responses/:id` - Get response details
+- PUT `/api/responses/:id` - Update response (for drafts)
+- DELETE `/api/responses/:id` - Delete response
+- GET `/api/responses/:id/answers` - Get answers for a response
+
+### Scoring and Analysis Endpoints
+- GET `/api/questionnaires/:id/scoring-config` - Get scoring configuration
+- POST `/api/questionnaires/:id/scoring-config` - Create/update scoring configuration
+- GET `/api/responses/:id/score` - Get calculated score for a response
+- GET `/api/responses/:id/risk-assessment` - Get risk assessment for a response
+
+### AI Analysis Endpoints
+- POST `/api/ai-analysis/responses/:id` - Generate AI analysis for a response
+- GET `/api/ai-analysis/responses/:id` - Get AI analysis for a response
+- GET `/api/ai-analysis/history` - Get history of AI analyses
+
+### Organization Management Endpoints
+- GET `/api/organizations` - Get list of organizations
+- POST `/api/organizations` - Create a new organization
+- GET `/api/organizations/:id` - Get organization details
+- PUT `/api/organizations/:id` - Update organization
+- DELETE `/api/organizations/:id` - Delete organization
+- GET `/api/organizations/:id/members` - Get organization members
+- POST `/api/organizations/:id/members` - Add member to organization
+- DELETE `/api/organizations/:id/members/:userId` - Remove member from organization
+- PUT `/api/organizations/:id/members/:userId/role` - Update member role
+
+### Analytics and Reporting Endpoints
+- GET `/api/analytics/questionnaires/:id` - Get analytics for a questionnaire
+- GET `/api/analytics/responses` - Get response analytics
+- GET `/api/analytics/users` - Get user analytics (admin only)
+- GET `/api/analytics/organizations/:id` - Get organization analytics
+- POST `/api/reports/generate` - Generate a custom report
+- GET `/api/reports` - Get list of generated reports
+- GET `/api/reports/:id` - Get report details
+
+### Notification Endpoints
+- GET `/api/notifications` - Get user notifications
+- PUT `/api/notifications/:id/read` - Mark notification as read
+- PUT `/api/notifications/read-all` - Mark all notifications as read
+- GET `/api/notifications/settings` - Get notification settings
+- PUT `/api/notifications/settings` - Update notification settings
+
+## Frontend Implementation
+
+### Authentication Pages
+- Login page with email/password form
+- Registration page with validation
+- Forgot password page
+- Reset password page
+- Email verification page
+
+### Dashboard Pages
+- Main dashboard with overview statistics
+- User profile management
+- Account settings
+
+### Questionnaire Management Pages
+- Questionnaire list with filtering and sorting
+- Questionnaire creation form with:
+  - Basic information section
+  - Question builder with different question types
+  - Scoring configuration
+  - Publication settings
+- Questionnaire edit page
+- Questionnaire preview
+- QR code generation page
+
+### Response Management Pages
+- Response list with filtering and sorting
+- Response detail view with:
+  - Respondent information
+  - Answer display
+  - Score visualization
+  - Risk assessment
+  - AI analysis section
+
+### Organization Management Pages
+- Organization list
+- Organization creation form
+- Organization detail view
+- Member management interface
+- Organization settings
+
+### Analytics Pages
+- Response analytics dashboard
+- User engagement analytics
+- Questionnaire performance analytics
+- Custom report builder
+
+### Client-Facing Pages
+- Public questionnaire response form
+- Multi-page questionnaire navigation
+- Completion confirmation page
+- Results display (if enabled)
+
+## Reusable Components
+
+### UI Components
+- Button variants (primary, secondary, danger, etc.)
+- Form inputs (text, select, checkbox, radio, etc.)
+- Card components
+- Modal dialogs
+- Tabs and navigation
+- Tables with sorting and pagination
+- Alerts and notifications
+- Loading indicators
+- Error displays
+
+### Questionnaire Components
+- Question type renderers
+- Question builder forms
+- Response visualization
+- Progress indicators
+- Scoring display
+- QR code generator
+
+### Analytics Components
+- Chart components (line, bar, pie, etc.)
+- Data tables with export
+- Metric cards
+- Date range selectors
+- Filter controls
+
+### AI Components
+- Analysis request form
+- Analysis result display
+- Recommendation cards
+- Risk level indicators
+
+## Development Guidelines
+
+### Code Organization
+- Use feature-based organization within the frontend and API
+- Keep components small and focused on a single responsibility
+- Use custom hooks for shared logic
+- Implement proper error handling throughout the application
+- Add comprehensive logging for debugging and monitoring
+
+### State Management
+- Use React Context for global state
+- Implement proper loading and error states
+- Add optimistic updates for better UX
+- Use SWR or React Query for data fetching and caching
+
+### API Communication
+- Create a centralized API service
+- Implement proper error handling and retry logic
+- Add request/response interceptors for authentication
+- Use TypeScript interfaces for API responses
+
+### Authentication
+- Implement JWT token-based authentication
+- Add refresh token mechanism
+- Store tokens securely (HTTP-only cookies preferred)
+- Implement proper session management
+
+### Database Access
+- Use a repository pattern for database access
+- Implement proper transaction handling
+- Add data validation at the database level
+- Use prepared statements to prevent SQL injection
+
+### Security Considerations
+- Implement proper input validation
+- Add rate limiting for API endpoints
+- Use CSRF protection
+- Implement proper authorization checks
+- Add audit logging for sensitive operations
+- Use HTTPS for all communications
+- Implement proper password hashing (bcrypt)
+
+### Testing Strategy
+- Write unit tests for critical business logic
+- Add integration tests for API endpoints
+- Implement end-to-end tests for critical user flows
+- Use mock services for external dependencies
+- Add performance testing for high-traffic endpoints
+
+### Deployment Strategy
+- Use Vercel for continuous deployment
+- Implement staging and production environments
+- Add environment-specific configuration
+- Use feature flags for controlled rollouts
+- Implement proper monitoring and alerting
+
+## Implementation Priorities
+
+### Immediate Focus (First 2 Weeks)
+1. Authentication system
+2. User management
+3. Basic questionnaire CRUD operations
+4. Simple question types
+5. Basic response collection
+
+### Medium-Term Focus (Next 4 Weeks)
+1. Advanced question types
+2. Scoring and risk assessment
+3. Organization management
+4. Basic analytics
+5. QR code generation
+
+### Long-Term Focus (Beyond 6 Weeks)
+1. AI analysis integration
+2. Advanced analytics and reporting
+3. Notification system
+4. Mobile optimization
+5. Advanced features (Google Form import, webhooks, etc.)
+
+## Technical Debt Considerations
+- Plan for database migrations as schema evolves
+- Consider performance optimization for large datasets
+- Plan for internationalization from the beginning
+- Design with accessibility in mind
+- Consider future scalability requirements
+
+## Monitoring and Maintenance
+- Implement error tracking (Sentry, etc.)
+- Add performance monitoring
+- Create automated backups for database
+- Plan for regular security updates
+- Implement usage analytics
+
+## Documentation Requirements
+- API documentation with examples
+- User guides for different user roles
+- Administrator documentation
+- Developer onboarding documentation
+- Database schema documentation

@@ -1,0 +1,1075 @@
+# AdminDashboardPro Wireframe Documentation
+
+## Overview
+This document outlines the wireframe specifications for all pages in the AdminDashboardPro application, including features, functionalities, components, and sections for each page.
+
+## Global Components
+
+### Navigation Components
+1. **Sidebar**
+   - Logo at top
+   - User profile summary (avatar, name)
+   - Main navigation links with icons
+   - Collapsible sections for sub-navigation
+   - Collapse/expand toggle
+   - Logout button at bottom
+   - Responsive design (hamburger menu on mobile)
+
+2. **Top Navbar**
+   - Search bar (global search)
+   - Notification bell with counter
+   - Help/support button
+   - User profile dropdown
+   - Quick action buttons
+   - Breadcrumb navigation
+
+3. **Footer**
+   - Copyright information
+   - Version number
+   - Quick links (Privacy Policy, Terms of Service)
+   - Language selector
+
+### Common UI Components
+1. **Data Tables**
+   - Sortable columns
+   - Filterable data
+   - Pagination controls
+   - Bulk action checkboxes
+   - Row action buttons
+   - Export options (CSV, PDF)
+   - Responsive design (horizontal scroll on mobile)
+
+2. **Cards**
+   - Title with optional icon
+   - Content area
+   - Footer with actions
+   - Loading state
+   - Error state
+   - Hover effects
+   - Collapsible option
+
+3. **Forms**
+   - Input fields with labels
+   - Validation messages
+   - Required field indicators
+   - Help text tooltips
+   - Submit and cancel buttons
+   - Form sections/fieldsets
+   - Responsive layout
+
+4. **Modals**
+   - Title bar with close button
+   - Content area
+   - Action buttons
+   - Backdrop overlay
+   - Responsive sizing
+   - Animation effects
+   - Scrollable content for long forms
+
+5. **Buttons**
+   - Primary action
+   - Secondary action
+   - Tertiary/text buttons
+   - Icon buttons
+   - Button groups
+   - Loading state
+   - Disabled state
+
+6. **Charts and Visualizations**
+   - Bar charts
+   - Line charts
+   - Pie/donut charts
+   - Area charts
+   - Heatmaps
+   - Interactive tooltips
+   - Legend
+   - Time period selectors
+
+7. **Alerts and Notifications**
+   - Success messages
+   - Error messages
+   - Warning messages
+   - Info messages
+   - Toast notifications
+   - Dismissible alerts
+   - Action links within alerts
+
+## Page Wireframes
+
+### 1. Landing Page
+**Features & Functionality:**
+- Showcase product benefits
+- Drive user sign-ups
+- Provide product information
+
+**Sections:**
+1. **Hero Section**
+   - Headline and subheadline
+   - Primary CTA button (Get Started)
+   - Secondary CTA (Learn More)
+   - Background image or illustration
+
+2. **Features Section**
+   - 3-4 feature cards with icons
+   - Brief description for each feature
+   - Visual representations
+
+3. **How It Works**
+   - Step-by-step process visualization
+   - Numbered steps with icons
+   - Brief explanations
+
+4. **Testimonials**
+   - Customer quotes
+   - Customer avatars and names
+   - Company logos (if applicable)
+
+5. **Pricing Section**
+   - Pricing tiers (cards)
+   - Feature comparison
+   - CTA buttons for each tier
+
+6. **FAQ Section**
+   - Accordion-style questions and answers
+   - Contact link for additional questions
+
+7. **Contact/CTA Section**
+   - Final call-to-action
+   - Email signup form
+   - Alternative contact methods
+
+**Components:**
+- Navigation menu
+- CTA buttons
+- Feature cards
+- Testimonial carousel
+- Pricing comparison table
+- FAQ accordion
+- Contact form
+- Footer with links
+
+### 2. Authentication Pages
+
+#### 2.1 Login Page
+**Features & Functionality:**
+- User authentication
+- Password recovery
+- New user registration
+
+**Sections:**
+1. **Login Form**
+   - Email/username field
+   - Password field with show/hide toggle
+   - Remember me checkbox
+   - Forgot password link
+   - Login button
+   - Social login options (optional)
+
+2. **Secondary Actions**
+   - Register account link
+   - Help/support link
+
+**Components:**
+- Form inputs
+- Checkbox
+- Buttons
+- Error messages
+- Loading indicator
+
+#### 2.2 Registration Page
+**Features & Functionality:**
+- New user account creation
+- Terms acceptance
+
+
+**Sections:**
+1. **Registration Form**
+   - Name fields
+   - Email field
+   - Password field with requirements indicator
+   - Confirm password field
+   - Terms and conditions checkbox
+   - Register button
+
+2. **Secondary Actions**
+   - Login link for existing users
+   - Help/support link
+
+**Components:**
+- Form inputs
+- Password strength indicator
+- Checkbox for terms
+- Submit button
+- Error messages
+
+#### 2.3 Forgot Password Page
+**Features & Functionality:**
+- Password reset request
+- Email verification
+
+**Sections:**
+1. **Reset Request Form**
+   - Email field
+   - Submit button
+   - Back to login link
+
+2. **Confirmation Section**
+   - Success message
+   - Instructions
+   - Return to login button
+
+**Components:**
+- Form input
+- Submit button
+- Alert messages
+
+### 3. Dashboard Home
+
+**Features & Functionality:**
+- Overview of key metrics
+- Recent activity
+- Quick actions
+- System status
+
+**Sections:**
+1. **Welcome Banner**
+   - Personalized greeting
+   - Date and time
+   - Quick tips or announcements
+   - Dismissible
+
+2. **Key Metrics**
+   - 4-6 metric cards
+   - Icons representing each metric
+   - Current value and trend indicator
+   - Time period selector
+
+3. **Recent Activity**
+   - Timeline of recent events
+   - Filterable by activity type
+   - User avatars
+   - Timestamps
+   - Action links
+
+4. **Quick Actions**
+   - Button grid for common tasks
+   - Icons and labels
+   - Shortcut to creation flows
+
+5. **Recent Questionnaires**
+   - List of recently created/modified questionnaires
+   - Status indicators
+   - Response counts
+   - Action buttons
+
+6. **Recent Responses**
+   - Table of recent responses
+   - Risk level indicators
+   - Timestamps
+   - Action links
+
+**Components:**
+- Metric cards
+- Timeline component
+- Action button grid
+- Data tables
+- Chart widgets
+- Status indicators
+
+### 4. Questionnaire Management
+
+#### 4.1 Questionnaires List
+**Features & Functionality:**
+- View all questionnaires
+- Filter and search
+- Create new questionnaires
+- Manage existing questionnaires
+
+**Sections:**
+1. **Action Bar**
+   - Create new button
+   - Import button
+   - Bulk actions dropdown
+   - View toggle (grid/list)
+   - Search field
+
+2. **Filters Panel**
+   - Status filter (active/inactive)
+   - Type filter
+   - Category filter
+   - Date range filter
+   - Clear filters button
+
+3. **Questionnaires Table/Grid**
+   - Title and description
+   - Status indicator
+   - Creation date
+   - Response count
+   - Action buttons (edit, view, delete)
+
+**Components:**
+- Action buttons
+- Search input
+- Filter dropdowns
+- Data table/card grid
+- Status badges
+- Pagination
+
+#### 4.2 Create/Edit Questionnaire
+**Features & Functionality:**
+- Create new questionnaires
+- Edit existing questionnaires
+- Configure questionnaire settings
+- Preview questionnaire
+
+**Sections:**
+1. **Form Header**
+   - Title input
+   - Save/publish buttons
+   - Cancel button
+   - Preview button
+
+2. **Basic Information**
+   - Title field
+   - Description field (rich text)
+   - Category dropdown
+   - Tags input
+   - Estimated completion time
+
+3. **Settings Panel**
+   - Active toggle
+   - Public/private toggle
+   - Anonymous responses toggle
+   - QR code enabled toggle
+   - Expiration date picker
+   - Maximum responses limit
+
+4. **Advanced Settings**
+   - Adaptive logic toggle
+   - Template toggle
+   - Organization selector
+   - Authentication requirement toggle
+
+5. **Questions Section**
+   - Add question button
+   - Question list/cards
+   - Drag-and-drop reordering
+   - Question type indicators
+   - Edit/delete buttons for each question
+
+**Components:**
+- Form inputs
+- Rich text editor
+- Toggle switches
+- Date picker
+- Number input
+- Drag-and-drop interface
+- Preview modal
+
+#### 4.3 Question Editor
+**Features & Functionality:**
+- Create different question types
+- Configure question options
+- Set validation rules
+- Configure conditional logic
+
+**Sections:**
+1. **Question Type Selector**
+   - Icons for each question type
+   - Brief description
+
+2. **Question Content**
+   - Question text field (rich text)
+   - Help text field
+   - Required toggle
+
+3. **Answer Options** (for applicable types)
+   - Option list with add/remove buttons
+   - Default value selector
+   - Option reordering
+
+4. **Validation Rules**
+   - Min/max values (for numeric)
+   - Pattern validation (for text)
+   - Error message customization
+
+5. **Conditional Logic**
+   - Condition builder interface
+   - Question dependency selector
+   - Logic operators
+   - Value comparison
+
+**Components:**
+- Type selector buttons
+- Rich text editor
+- Toggle switches
+- Option list builder
+- Validation controls
+- Conditional logic builder
+
+#### 4.4 QR Code Generator
+**Features & Functionality:**
+- Generate QR codes for questionnaires
+- Customize QR code appearance
+- Download and share QR codes
+
+**Sections:**
+1. **QR Code Display**
+   - Large QR code image
+   - Questionnaire title
+   - URL display
+
+2. **Customization Options**
+   - Size selector
+   - Color picker
+   - Logo upload option
+   - Error correction level
+
+3. **Actions**
+   - Download button (PNG, SVG, PDF)
+   - Copy URL button
+   - Share button (email, social)
+   - Print button
+
+**Components:**
+- QR code generator
+- Customization controls
+- Action buttons
+- Preview area
+
+### 5. Response Management
+
+#### 5.1 Responses List
+**Features & Functionality:**
+- View all responses
+- Filter and search responses
+- Export response data
+- View response details
+
+**Sections:**
+1. **Action Bar**
+   - Export button
+   - Bulk actions dropdown
+   - Search field
+   - Date range selector
+
+2. **Filters Panel**
+   - Questionnaire filter
+   - Risk level filter
+   - Completion status filter
+   - Date range filter
+   - Clear filters button
+
+3. **Responses Table**
+   - Respondent information
+   - Questionnaire name
+   - Submission date
+   - Completion time
+   - Score/risk level
+   - Action buttons (view, delete)
+
+**Components:**
+- Action buttons
+- Search input
+- Filter dropdowns
+- Data table
+- Risk level badges
+- Pagination
+- Export options modal
+
+#### 5.2 Response Detail
+**Features & Functionality:**
+- View complete response details
+- Review individual answers
+- Assess risk level
+- Generate AI analysis
+- Export response data
+
+**Sections:**
+1. **Response Header**
+   - Questionnaire name
+   - Respondent information
+   - Submission date and time
+   - Completion time
+   - Back to list button
+
+2. **Summary Panel**
+   - Score display
+   - Risk level indicator
+   - Flag for review toggle
+   - Key metrics
+
+3. **Respondent Information**
+   - Name
+   - Email
+   - Identifier
+   - Demographics (if collected)
+
+4. **Answers List**
+   - Question text
+   - Answer value
+   - Question type indicator
+   - Flagged answers indicator
+
+5. **Analysis Panel**
+   - Risk assessment
+   - AI-generated insights
+   - Recommendations
+   - Generate analysis button
+
+**Components:**
+- Information cards
+- Risk level indicator
+- Toggle switches
+- Answers accordion/table
+- Analysis card
+- Action buttons
+
+### 6. Organization Management
+
+#### 6.1 Organizations List
+**Features & Functionality:**
+- View all organizations
+- Filter and search organizations
+- Create new organizations
+- Manage existing organizations
+
+**Sections:**
+1. **Action Bar**
+   - Create new button
+   - Import button
+   - Search field
+
+2. **Filters Panel**
+   - Type filter
+   - Status filter
+   - Date range filter
+   - Clear filters button
+
+3. **Organizations Table/Grid**
+   - Name and description
+   - Type indicator
+   - Member count
+   - Creation date
+   - Action buttons (edit, view, delete)
+
+**Components:**
+- Action buttons
+- Search input
+- Filter dropdowns
+- Data table/card grid
+- Type badges
+- Pagination
+
+#### 6.2 Organization Detail
+**Features & Functionality:**
+- View organization details
+- Manage organization members
+- View organization questionnaires
+- Edit organization settings
+
+**Sections:**
+1. **Organization Header**
+   - Name and logo
+   - Type indicator
+   - Creation date
+   - Edit button
+   - Back to list button
+
+2. **Overview Panel**
+   - Description
+   - Contact information
+   - Address
+   - Member count
+   - Questionnaire count
+
+3. **Members Tab**
+   - Members table
+   - Add member button
+   - Role indicators
+   - Action buttons (edit role, remove)
+
+4. **Questionnaires Tab**
+   - Questionnaires table
+   - Create questionnaire button
+   - Status indicators
+   - Response counts
+   - Action buttons
+
+5. **Settings Tab**
+   - Organization details form
+   - Logo upload
+   - Save changes button
+
+**Components:**
+- Tab navigation
+- Information cards
+- Member table
+- Questionnaire table
+- Settings form
+- Action buttons
+
+### 7. Analytics Dashboard
+
+#### 7.1 Main Analytics
+**Features & Functionality:**
+- View key performance metrics
+- Analyze trends over time
+- Filter data by various dimensions
+- Export reports
+
+**Sections:**
+1. **Time Period Selector**
+   - Predefined periods (today, week, month, year)
+   - Custom date range picker
+   - Compare to previous period toggle
+
+2. **KPI Summary**
+   - 4-6 key metric cards
+   - Current value and trend
+   - Comparison to previous period
+   - Sparkline charts
+
+3. **Response Trends**
+   - Line chart showing responses over time
+   - Multiple series for different questionnaires
+   - Interactive tooltips
+   - Zoom and pan controls
+
+4. **Distribution Charts**
+   - Risk level distribution (pie/donut chart)
+   - Completion time distribution (histogram)
+   - Demographic breakdowns (bar charts)
+
+5. **Top Questionnaires**
+   - Bar chart of most used questionnaires
+   - Response counts
+   - Completion rates
+   - Average scores
+
+**Components:**
+- Date range picker
+- Metric cards
+- Line charts
+- Bar charts
+- Pie/donut charts
+- Histograms
+- Data tables
+- Export buttons
+
+#### 7.2 Response Analytics
+**Features & Functionality:**
+- Analyze response patterns
+- Identify trends in answers
+- Compare responses across dimensions
+- Generate insights
+
+**Sections:**
+1. **Filters Panel**
+   - Questionnaire selector
+   - Date range picker
+   - Demographic filters
+   - Risk level filters
+
+2. **Response Volume**
+   - Line chart of responses over time
+   - Day/week/month toggle
+   - Completion rate overlay
+
+3. **Answer Analysis**
+   - Question selector
+   - Answer distribution chart
+   - Correlation with risk level
+   - Trend over time
+
+4. **Demographic Insights**
+   - Age group comparison
+   - Gender comparison
+   - Other demographic breakdowns
+   - Heatmap visualization
+
+5. **Export Options**
+   - Report generation button
+   - Data export options
+   - Schedule report button
+
+**Components:**
+- Filter controls
+- Line charts
+- Bar charts
+- Heatmaps
+- Correlation matrices
+- Data tables
+- Export options
+
+### 8. AI Analysis
+
+#### 8.1 AI Dashboard
+**Features & Functionality:**
+- Generate AI insights from responses
+- View analysis history
+- Configure analysis parameters
+- Export analysis reports
+
+**Sections:**
+1. **Analysis Creator**
+   - Response selector
+   - Analysis type selector
+   - Custom prompt input
+   - Generate button
+
+2. **Recent Analyses**
+   - List of recent analyses
+   - Analysis type indicators
+   - Creation timestamps
+   - View/export buttons
+
+3. **Featured Insights**
+   - Key insights cards
+   - Risk assessments
+   - Recommendation highlights
+   - Action links
+
+4. **Model Settings**
+   - AI model selector
+   - Parameter adjustments
+   - Custom template management
+   - Save settings button
+
+**Components:**
+- Selector dropdowns
+- Text input area
+- Action buttons
+- Analysis cards
+- Settings controls
+- History table
+
+#### 8.2 Analysis Detail
+**Features & Functionality:**
+- View detailed AI analysis
+- Review recommendations
+- Compare with previous analyses
+- Export and share analysis
+
+**Sections:**
+1. **Analysis Header**
+   - Response identifier
+   - Analysis timestamp
+   - Model used
+   - Back button
+
+2. **Summary Panel**
+   - Key findings
+   - Risk assessment
+   - Confidence level
+   - Action recommendations
+
+3. **Detailed Analysis**
+   - Full analysis text
+   - Section breakdown
+   - Evidence points
+   - Reference to specific answers
+
+4. **Recommendations**
+   - Prioritized recommendations
+   - Action steps
+   - Resource links
+   - Follow-up suggestions
+
+5. **Actions**
+   - Export button
+   - Share button
+   - Regenerate button
+   - Save to record button
+
+**Components:**
+- Information cards
+- Text display panels
+- Recommendation cards
+- Action buttons
+- Comparison view
+
+### 9. Email Management
+
+#### 9.1 Email Dashboard
+**Features & Functionality:**
+- Send emails to respondents
+- Manage email templates
+- View email history
+- Configure automated emails
+
+**Sections:**
+1. **Quick Send**
+   - Recipient selector
+   - Template selector
+   - Subject line
+   - Send button
+
+2. **Recent Emails**
+   - Table of recently sent emails
+   - Status indicators
+   - Recipient information
+   - Open/click rates
+
+3. **Templates**
+   - Template cards
+   - Create template button
+   - Edit/duplicate buttons
+   - Usage statistics
+
+4. **Automation Rules**
+   - Rule cards
+   - Create rule button
+   - Status toggles
+   - Edit buttons
+
+**Components:**
+- Selector dropdowns
+- Email preview
+- Data tables
+- Template cards
+- Rule cards
+- Status indicators
+
+#### 9.2 Email Composer
+**Features & Functionality:**
+- Create and edit email content
+- Use templates and variables
+- Preview emails
+- Schedule sending
+
+**Sections:**
+1. **Recipient Selection**
+   - Individual recipient input
+   - Group/list selector
+   - Filter by questionnaire/response
+   - Recipient count
+
+2. **Email Content**
+   - Subject line input
+   - Rich text editor
+   - Variable insertion tool
+   - Template selector
+
+3. **Preview Panel**
+   - Desktop preview
+   - Mobile preview
+   - Test send button
+   - Variable preview
+
+4. **Sending Options**
+   - Send now button
+   - Schedule for later option
+   - Date and time picker
+   - Recurring option
+
+**Components:**
+- Recipient selector
+- Rich text editor
+- Variable picker
+- Preview pane
+- Scheduling controls
+- Action buttons
+
+#### 9.3 Template Editor
+**Features & Functionality:**
+- Create and edit email templates
+- Define variables
+- Test templates
+- Manage template categories
+
+**Sections:**
+1. **Template Info**
+   - Name input
+   - Description input
+   - Category selector
+   - Save button
+
+2. **Content Editor**
+   - Subject line input
+   - Rich text editor
+   - HTML code editor toggle
+   - Variable insertion tool
+
+3. **Variable Management**
+   - Available variables list
+   - Custom variable creation
+   - Default values
+   - Required indicators
+
+4. **Preview and Test**
+   - Preview pane
+   - Test data input
+   - Send test button
+   - Mobile/desktop toggle
+
+**Components:**
+- Form inputs
+- Rich text editor
+- Code editor
+- Variable manager
+- Preview pane
+- Test controls
+
+### 10. Settings
+
+#### 10.1 Profile Settings
+**Features & Functionality:**
+- Update personal information
+- Change password
+- Manage notification preferences
+- Configure UI preferences
+
+**Sections:**
+1. **Personal Information**
+   - Name fields
+   - Email field
+   - Profile picture upload
+   - Save changes button
+
+2. **Password Management**
+   - Current password field
+   - New password field
+   - Confirm password field
+   - Password requirements
+   - Update button
+
+3. **Notification Settings**
+   - Email notification toggles
+   - In-app notification toggles
+   - Notification frequency selector
+   - Save preferences button
+
+4. **UI Preferences**
+   - Theme selector (light/dark/system)
+   - Density setting
+   - Language selector
+   - Timezone selector
+   - Save preferences button
+
+**Components:**
+- Form inputs
+- Image uploader
+- Toggle switches
+- Selector dropdowns
+- Action buttons
+
+#### 10.2 Application Settings
+**Features & Functionality:**
+- Configure system-wide settings
+- Manage API keys
+- Set default preferences
+- Configure integrations
+
+**Sections:**
+1. **General Settings**
+   - Company name
+   - Logo upload
+   - Default language
+   - Default timezone
+   - Date and time format
+
+2. **API Management**
+   - API key display
+   - Generate new key button
+   - Usage statistics
+   - Permission settings
+
+3. **Integration Settings**
+   - Integration cards
+   - Connection status
+   - Configure buttons
+   - Authentication settings
+
+4. **Email Configuration**
+   - SMTP settings
+   - Default sender
+   - Email signature
+   - Test connection button
+
+**Components:**
+- Form inputs
+- Image uploader
+- API key manager
+- Integration cards
+- Connection testers
+- Action buttons
+
+### 11. Client Questionnaire
+
+#### 11.1 Questionnaire Response
+**Features & Functionality:**
+- Answer questionnaire questions
+- Navigate between questions
+- Save progress
+- Submit responses
+
+**Sections:**
+1. **Questionnaire Header**
+   - Title and description
+   - Progress indicator
+   - Estimated time remaining
+   - Save and exit button
+
+2. **Question Display**
+   - Question text
+   - Help text
+   - Input field (varies by question type)
+   - Validation messages
+
+3. **Navigation**
+   - Previous button
+   - Next button
+   - Question navigator (for longer questionnaires)
+   - Submit button (on last question)
+
+4. **Information Panel**
+   - Instructions
+   - Contact information
+   - Privacy notice
+   - Collapsible
+
+**Components:**
+- Progress bar
+- Various input types (text, select, radio, checkbox)
+- Navigation buttons
+- Validation indicators
+- Information accordion
+
+#### 11.2 Completion Page
+**Features & Functionality:**
+- Confirm submission
+- Show summary
+- Provide next steps
+- Allow sharing
+
+**Sections:**
+1. **Confirmation Message**
+   - Thank you message
+   - Submission confirmation
+   - Reference number
+   - Date and time stamp
+
+2. **Summary Panel** (if applicable)
+   - Key responses
+   - Score/result
+   - Interpretation
+   - Recommendations
+
+3. **Next Steps**
+   - Instructions
+   - Contact information
+   - Follow-up details
+   - Resource links
+
+4. **Actions**
+   - Return home button
+   - Start another button
+   - Download PDF button
+   - Share button
+
+**Components:**
+- Confirmation card
+- Summary display
+- Action buttons
+- Resource links

@@ -1,0 +1,142 @@
+# MindTrack Design System
+
+## Color Palette
+
+### Primary Colors
+- Primary: #3b82f6 (Blue)
+- Primary Dark: #1d4ed8
+- Primary Light: #93c5fd
+
+### Secondary Colors
+- Secondary: #8b5cf6 (Purple)
+- Secondary Dark: #6d28d9
+- Secondary Light: #c4b5fd
+
+### Neutral Colors
+- Background: #f9fafb
+- Surface: #ffffff
+- Text Primary: #111827
+- Text Secondary: #4b5563
+- Text Tertiary: #9ca3af
+- Border: #e5e7eb
+
+### Semantic Colors
+- Success: #10b981
+- Warning: #f59e0b
+- Error: #ef4444
+- Info: #3b82f6
+
+## Typography
+
+### Font Families
+- Heading: 'Inter', sans-serif
+- Body: 'Inter', sans-serif
+- Mono: 'JetBrains Mono', monospace
+
+### Font Sizes
+- xs: 0.75rem (12px)
+- sm: 0.875rem (14px)
+- base: 1rem (16px)
+- lg: 1.125rem (18px)
+- xl: 1.25rem (20px)
+- 2xl: 1.5rem (24px)
+- 3xl: 1.875rem (30px)
+- 4xl: 2.25rem (36px)
+- 5xl: 3rem (48px)
+
+### Font Weights
+- Light: 300
+- Regular: 400
+- Medium: 500
+- Semibold: 600
+- Bold: 700
+
+## Spacing
+
+- 0: 0
+- 1: 0.25rem (4px)
+- 2: 0.5rem (8px)
+- 3: 0.75rem (12px)
+- 4: 1rem (16px)
+- 5: 1.25rem (20px)
+- 6: 1.5rem (24px)
+- 8: 2rem (32px)
+- 10: 2.5rem (40px)
+- 12: 3rem (48px)
+- 16: 4rem (64px)
+- 20: 5rem (80px)
+- 24: 6rem (96px)
+
+## Border Radius
+
+- none: 0
+- sm: 0.125rem (2px)
+- default: 0.25rem (4px)
+- md: 0.375rem (6px)
+- lg: 0.5rem (8px)
+- xl: 0.75rem (12px)
+- 2xl: 1rem (16px)
+- full: 9999px
+
+## Shadows
+
+- sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05)
+- default: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)
+- md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)
+- lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)
+- xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)
+- 2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25)
+
+## Components
+
+### Buttons
+
+#### Variants
+- Primary: Solid background with primary color
+- Secondary: Solid background with secondary color
+- Outline: Transparent background with colored border
+- Ghost: Transparent background and border, colored text
+- Link: No background or border, colored text with underline on hover
+
+#### Sizes
+- sm: Small button
+- md: Medium button (default)
+- lg: Large button
+
+### Cards
+
+- Surface color background
+- Border radius: lg
+- Shadow: md
+- Padding: 6
+
+### Inputs
+
+- Border radius: md
+- Border: 1px solid border color
+- Focus: Primary color ring
+- Padding: 4 (vertical), 3 (horizontal)
+
+### Navigation
+
+- Background: Surface color
+- Active item: Primary color
+- Hover: Light gray background
+
+## Layout
+
+### Container
+- Max width: 1280px
+- Padding: 4 (on small screens), 6 (on medium screens)
+- Margin: 0 auto
+
+### Grid
+- 12-column grid system
+- Gap: 6
+
+### Breakpoints
+- sm: 640px
+- md: 768px
+- lg: 1024px
+- xl: 1280px
+- 2xl: 1536px

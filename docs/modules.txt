@@ -1,0 +1,350 @@
+# MindTrack System Modules Documentation
+
+## 1. Authentication Module
+
+### Purpose
+Manages user authentication, authorization, and session management.
+
+### Components
+- **Auth Controller** (`server/controllers/auth.controller.js`)
+  - Handles login, registration, password reset, and token validation
+  - Implements JWT token generation and verification
+  - Manages refresh tokens for extended sessions
+
+- **Auth Middleware** (`server/middleware/auth.middleware.js`)
+  - Validates JWT tokens for protected routes
+  - Checks user permissions for role-based access
+  - Prevents unauthorized access to protected resources
+
+- **Auth Service** (`server/services/auth.service.js`)
+  - Implements business logic for authentication
+  - Handles password hashing and comparison
+  - Manages token generation and validation
+
+- **Auth Routes** (`server/routes/auth.routes.js`)
+  - Defines API endpoints for authentication operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `users` - Stores user credentials and profile information
+- `refresh_tokens` - Stores refresh tokens for extended sessions
+
+### API Endpoints
+- `POST /api/auth/register` - Create new user account
+- `POST /api/auth/login` - Authenticate user and generate tokens
+- `POST /api/auth/refresh` - Refresh access token
+- `POST /api/auth/logout` - Invalidate tokens
+- `POST /api/auth/forgot-password` - Initiate password reset
+- `POST /api/auth/reset-password` - Complete password reset
+
+## 2. User Management Module
+
+### Purpose
+Manages user profiles, roles, and permissions.
+
+### Components
+- **User Controller** (`server/controllers/user.controller.js`)
+  - Handles CRUD operations for user profiles
+  - Manages user roles and permissions
+  - Implements user search and filtering
+
+- **User Service** (`server/services/user.service.js`)
+  - Implements business logic for user management
+  - Handles profile updates and role assignments
+  - Manages user relationships and organizations
+
+- **User Routes** (`server/routes/user.routes.js`)
+  - Defines API endpoints for user operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `users` - Stores user profiles and credentials
+- `roles` - Defines available roles in the system
+- `user_roles` - Maps users to roles (many-to-many)
+- `organizations` - Stores organization information
+- `user_organizations` - Maps users to organizations (many-to-many)
+
+### API Endpoints
+- `GET /api/users` - List users (with filtering)
+- `GET /api/users/:id` - Get user details
+- `PUT /api/users/:id` - Update user profile
+- `DELETE /api/users/:id` - Delete user
+- `GET /api/users/:id/roles` - Get user roles
+- `PUT /api/users/:id/roles` - Update user roles
+
+## 3. Questionnaire Module
+
+### Purpose
+Manages the creation, editing, and distribution of questionnaires.
+
+### Components
+- **Questionnaire Controller** (`server/controllers/questionnaire.controller.js`)
+  - Handles CRUD operations for questionnaires
+  - Manages questionnaire templates and versions
+  - Implements questionnaire search and filtering
+
+- **Question Controller** (`server/controllers/question.controller.js`)
+  - Handles CRUD operations for questions
+  - Manages question types and validation
+  - Implements question ordering and grouping
+
+- **Questionnaire Service** (`server/services/questionnaire.service.js`)
+  - Implements business logic for questionnaire management
+  - Handles questionnaire validation and publishing
+  - Manages questionnaire sharing and permissions
+
+- **Question Service** (`server/services/question.service.js`)
+  - Implements business logic for question management
+  - Handles question validation and scoring
+  - Manages question dependencies and skip logic
+
+- **Questionnaire Routes** (`server/routes/questionnaire.routes.js`)
+  - Defines API endpoints for questionnaire operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `questionnaires` - Stores questionnaire metadata
+- `questions` - Stores question content and configuration
+- `question_options` - Stores options for multiple-choice questions
+- `questionnaire_versions` - Tracks versions of questionnaires
+- `questionnaire_templates` - Stores reusable questionnaire templates
+
+### API Endpoints
+- `GET /api/questionnaires` - List questionnaires (with filtering)
+- `GET /api/questionnaires/:id` - Get questionnaire details
+- `POST /api/questionnaires` - Create new questionnaire
+- `PUT /api/questionnaires/:id` - Update questionnaire
+- `DELETE /api/questionnaires/:id` - Delete questionnaire
+- `GET /api/questionnaires/:id/questions` - Get questions for questionnaire
+- `POST /api/questionnaires/:id/questions` - Add question to questionnaire
+- `PUT /api/questionnaires/:id/publish` - Publish questionnaire
+
+## 4. Response Module
+
+### Purpose
+Manages the collection, storage, and retrieval of questionnaire responses.
+
+### Components
+- **Response Controller** (`server/controllers/response.controller.js`)
+  - Handles CRUD operations for responses
+  - Manages response submission and validation
+  - Implements response search and filtering
+
+- **Answer Controller** (`server/controllers/answer.controller.js`)
+  - Handles CRUD operations for individual answers
+  - Manages answer validation and scoring
+  - Implements answer analysis and reporting
+
+- **Response Service** (`server/services/response.service.js`)
+  - Implements business logic for response management
+  - Handles response validation and scoring
+  - Manages response analytics and reporting
+
+- **Answer Service** (`server/services/answer.service.js`)
+  - Implements business logic for answer management
+  - Handles answer validation and normalization
+  - Manages answer scoring and analysis
+
+- **Response Routes** (`server/routes/response.routes.js`)
+  - Defines API endpoints for response operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `responses` - Stores response metadata
+- `answers` - Stores individual question answers
+- `response_scores` - Stores calculated scores for responses
+- `response_flags` - Stores flags for responses requiring attention
+
+### API Endpoints
+- `GET /api/responses` - List responses (with filtering)
+- `GET /api/responses/:id` - Get response details
+- `POST /api/responses` - Create new response
+- `PUT /api/responses/:id` - Update response
+- `DELETE /api/responses/:id` - Delete response
+- `GET /api/responses/:id/answers` - Get answers for response
+- `PUT /api/responses/:id/flag` - Flag response for review
+- `GET /api/responses/statistics` - Get response statistics
+
+## 5. Google Form Integration Module
+
+### Purpose
+Enables importing Google Forms as questionnaires and collecting responses.
+
+### Components
+- **Google Form Controller** (`server/controllers/google-form.controller.js`)
+  - Handles Google Form import and extraction
+  - Manages mapping between Google Form fields and questionnaire questions
+  - Implements Google Form response processing
+
+- **Google Form Response Controller** (`server/controllers/google-form-response.controller.js`)
+  - Handles submission of responses from Google Forms
+  - Manages response validation and storage
+  - Implements response analysis and reporting
+
+- **Google Form Service** (`server/services/google-form.service.js`)
+  - Implements business logic for Google Form integration
+  - Handles form structure extraction and mapping
+  - Manages form import and synchronization
+
+- **Google Form Routes** (`server/routes/google-form.routes.js`)
+  - Defines API endpoints for Google Form operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- Uses existing `questionnaires`, `questions`, `responses`, and `answers` tables
+- `google_form_mappings` - Maps Google Form fields to questionnaire questions
+
+### API Endpoints
+- `POST /api/google-forms/extract` - Extract Google Form structure
+- `POST /api/google-forms/import` - Import Google Form as questionnaire
+- `POST /api/google-forms/:id/responses` - Submit Google Form response
+- `GET /api/google-forms/:id/responses` - Get responses for Google Form
+- `GET /api/google-forms/:id/statistics` - Get statistics for Google Form
+
+## 6. QR Code Module
+
+### Purpose
+Generates and manages QR codes for questionnaire access.
+
+### Components
+- **QR Code Controller** (`server/controllers/qr-code.controller.js`)
+  - Handles QR code generation and customization
+  - Manages QR code tracking and analytics
+  - Implements QR code validation and security
+
+- **QR Code Service** (`server/services/qr-code.service.js`)
+  - Implements business logic for QR code management
+  - Handles QR code generation and formatting
+  - Manages QR code tracking and analytics
+
+- **QR Code Routes** (`server/routes/qr-code.routes.js`)
+  - Defines API endpoints for QR code operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `qr_codes` - Stores QR code metadata and tracking information
+
+### API Endpoints
+- `GET /api/qr-code/:id` - Generate QR code for questionnaire
+- `GET /api/qr-code/:id/data` - Get QR code data for questionnaire
+- `GET /api/qr-code/track/:code` - Track QR code scan
+
+## 7. AI Analysis Module
+
+### Purpose
+Provides AI-powered analysis of questionnaire responses.
+
+### Components
+- **AI Analysis Controller** (`server/controllers/ai-analysis.controller.js`)
+  - Handles AI analysis generation and retrieval
+  - Manages analysis parameters and customization
+  - Implements analysis export and sharing
+
+- **AI Analysis Service** (`server/services/ai-analysis.service.js`)
+  - Implements business logic for AI analysis
+  - Handles integration with AI services (e.g., Google Gemini)
+  - Manages analysis caching and optimization
+
+- **AI Analysis Routes** (`server/routes/ai-analysis.routes.js`)
+  - Defines API endpoints for AI analysis operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- `ai_analyses` - Stores AI analysis results and metadata
+- `ai_analysis_prompts` - Stores customizable prompts for AI analysis
+
+### API Endpoints
+- `POST /api/ai-analyses/generate` - Generate AI analysis for response
+- `GET /api/ai-analyses/:id` - Get AI analysis details
+- `GET /api/responses/:id/ai-analyses` - Get AI analyses for response
+- `POST /api/ai-analyses/prompts` - Create custom analysis prompt
+- `GET /api/ai-analyses/prompts` - List available analysis prompts
+
+## 8. Statistics and Reporting Module
+
+### Purpose
+Provides statistical analysis and reporting for questionnaire responses.
+
+### Components
+- **Statistics Controller** (`server/controllers/statistics.controller.js`)
+  - Handles statistical calculations and aggregations
+  - Manages report generation and formatting
+  - Implements data visualization and export
+
+- **Statistics Service** (`server/services/statistics.service.js`)
+  - Implements business logic for statistical analysis
+  - Handles data aggregation and calculation
+  - Manages report generation and formatting
+
+- **Statistics Routes** (`server/routes/statistics.routes.js`)
+  - Defines API endpoints for statistics operations
+  - Maps routes to controller functions
+  - Applies appropriate middleware
+
+### Database Tables
+- Uses existing tables for data sources
+- `report_templates` - Stores reusable report templates
+- `saved_reports` - Stores generated reports
+
+### API Endpoints
+- `GET /api/statistics/questionnaires/:id` - Get statistics for questionnaire
+- `GET /api/statistics/responses` - Get statistics for responses
+- `GET /api/statistics/users` - Get user activity statistics
+- `POST /api/reports/generate` - Generate custom report
+- `GET /api/reports` - List saved reports
+- `GET /api/reports/:id` - Get report details
+
+## 9. Frontend Components
+
+### Purpose
+Provides user interface components for the MindTrack application.
+
+### Components
+- **Authentication Components** (`mindtrack/src/components/auth/`)
+  - Login form, registration form, password reset
+  - Authentication state management
+  - Protected route components
+
+- **Questionnaire Components** (`mindtrack/src/components/questionnaire/`)
+  - Questionnaire builder and editor
+  - Question type components
+  - Questionnaire preview and testing
+  - QR code generator
+
+- **Response Components** (`mindtrack/src/components/response/`)
+  - Response form and submission
+  - Response review and analysis
+  - Response filtering and search
+
+- **Analysis Components** (`mindtrack/src/components/analysis/`)
+  - AI analysis visualization
+  - Statistical charts and graphs
+  - Report generation and export
+
+- **Google Form Components** (`mindtrack/src/components/google-form/`)
+  - Google Form importer
+  - Google Form response
+  - Google Form analysis
+
+### API Services
+- **Authentication Service** (`mindtrack/src/lib/api-services/auth.service.ts`)
+- **User Service** (`mindtrack/src/lib/api-services/user.service.ts`)
+- **Questionnaire Service** (`mindtrack/src/lib/api-services/questionnaire.service.ts`)
+- **Response Service** (`mindtrack/src/lib/api-services/response.service.ts`)
+- **AI Analysis Service** (`mindtrack/src/lib/api-services/ai-analysis.service.ts`)
+- **Google Form Service** (`mindtrack/src/lib/api-services/google-form.service.ts`)
+
+### React Query Hooks
+- **Authentication Hooks** (`mindtrack/src/hooks/api/use-auth.ts`)
+- **User Hooks** (`mindtrack/src/hooks/api/use-user.ts`)
+- **Questionnaire Hooks** (`mindtrack/src/hooks/api/use-questionnaire.ts`)
+- **Response Hooks** (`mindtrack/src/hooks/api/use-response.ts`)
+- **AI Analysis Hooks** (`mindtrack/src/hooks/api/use-ai-analysis.ts`)
+- **Google Form Hooks** (`mindtrack/src/hooks/api/use-google-form.ts`)

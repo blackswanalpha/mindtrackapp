@@ -1,0 +1,870 @@
+# AdminDashboardPro Frontend API Schema Documentation
+
+## Overview
+This document outlines the frontend API schema for the AdminDashboardPro application. It describes how the frontend interacts with the backend API, including request formats, response handling, and error management.
+
+## API Service Architecture
+
+### Base Structure
+The frontend uses a service-based architecture to interact with the API:
+
+```
+client/src/services/
+├── api.service.ts        # Core API service with request handling
+├── auth.service.ts       # Authentication-related API calls
+├── questionnaire.service.ts  # Questionnaire-related API calls
+├── response.service.ts   # Response-related API calls
+├── organization.service.ts   # Organization-related API calls
+├── analytics.service.ts  # Analytics-related API calls
+├── ai.service.ts         # AI analysis-related API calls
+├── email.service.ts      # Email-related API calls
+└── mock-data.service.ts  # Mock data for development/testing
+```
+
+### Core API Service
+The `api.service.ts` file provides the foundation for all API interactions:
+
+```typescript
+// Base API URLs
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+
+// Request methods
+async function get<T>(endpoint: string, params?: Record<string, any>): Promise<T> {
+  // Implementation
+}
+
+async function post<T>(endpoint: string, data?: any): Promise<T> {
+  // Implementation
+}
+
+async function put<T>(endpoint: string, data?: any): Promise<T> {
+  // Implementation
+}
+
+async function del<T>(endpoint: string): Promise<T> {
+  // Implementation
+}
+
+// Token management
+function setToken(token: string): void {
+  // Implementation
+}
+
+function getToken(): string | null {
+  // Implementation
+}
+
+function clearToken(): void {
+  // Implementation
+}
+
+// Error handling
+function handleApiError(error: any): never {
+  // Implementation
+}
+```
+
+## Authentication API
+
+### Types
+```typescript
+interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+interface RegisterData {
+  name: string;
+  email: string;
+  password: string;
+}
+
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+interface AuthResponse {
+  token: string;
+  user: User;
+  message: string;
+}
+```
+
+### Methods
+```typescript
+// Login user
+async login(credentials: LoginCredentials): Promise<AuthResponse>
+
+// Register user
+async register(userData: RegisterData): Promise<AuthResponse>
+
+// Logout user
+logout(): void
+
+// Get current user profile
+async getCurrentUser(): Promise<User>
+
+// Change password
+async changePassword(currentPassword: string, newPassword: string): Promise<{ message: string }>
+
+// Check if user is authenticated
+isAuthenticated(): boolean
+```
+
+## Questionnaire API
+
+### Types
+```typescript
+interface Questionnaire {
+  id: number;
+  title: string;
+  description: string;
+  type: string;
+  category: string | null;
+  estimated_time: number;
+  is_active: boolean;
+  is_adaptive: boolean;
+  is_qr_enabled: boolean;
+  is_template: boolean;
+  is_public: boolean;
+  allow_anonymous: boolean;
+  requires_auth: boolean;
+  max_responses: number | null;
+  expires_at: string | null;
+  version: number;
+  parent_id: number | null;
+  tags: string[] | null;
+  organization_id: number | null;
+  created_by_id: number;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Question {
+  id: number;
+  questionnaire_id: number;
+  text: string;
+  type: 'text' | 'multiple_choice' | 'rating' | 'boolean';
+  required: boolean;
+  order_num: number;
+  options: string[] | null;
+  conditional_logic: any | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface CreateQuestionnaireData {
+  title: string;
+  description?: string;
+  type?: string;
+  category?: string;
+  estimated_time?: number;
+  is_active?: boolean;
+  is_adaptive?: boolean;
+  is_qr_enabled?: boolean;
+  is_template?: boolean;
+  is_public?: boolean;
+  allow_anonymous?: boolean;
+  requires_auth?: boolean;
+  max_responses?: number;
+  expires_at?: string;
+  organization_id?: number;
+}
+
+interface CreateQuestionData {
+  text: string;
+  type: 'text' | 'multiple_choice' | 'rating' | 'boolean';
+  required?: boolean;
+  order_num?: number;
+  options?: string[];
+  conditional_logic?: any;
+}
+```
+
+### Methods
+```typescript
+// Get all questionnaires
+async getAllQuestionnaires(): Promise<Questionnaire[]>
+
+// Get questionnaire by ID
+async getQuestionnaireById(id: number): Promise<Questionnaire>
+
+// Get questionnaire with questions
+async getQuestionnaireWithQuestions(id: number): Promise<Questionnaire & { questions: Question[] }>
+
+// Create a new questionnaire
+async createQuestionnaire(data: CreateQuestionnaireData): Promise<Questionnaire>
+
+// Update a questionnaire
+async updateQuestionnaire(id: number, data: Partial<CreateQuestionnaireData>): Promise<Questionnaire>
+
+// Delete a questionnaire
+async deleteQuestionnaire(id: number): Promise<{ message: string }>
+
+// Get questions for a questionnaire
+async getQuestions(id: number): Promise<Question[]>
+
+// Create a new question
+async createQuestion(questionnaireId: number, data: CreateQuestionData): Promise<Question>
+
+// Update a question
+async updateQuestion(id: number, data: Partial<CreateQuestionData>): Promise<Question>
+
+// Delete a question
+async deleteQuestion(id: number): Promise<{ message: string }>
+
+// Generate QR code for a questionnaire
+generateQRCode(id: number): string
+```
+
+## Response API
+
+### Types
+```typescript
+interface Response {
+  id: number;
+  questionnaire_id: number;
+  patient_identifier: string | null;
+  patient_name: string | null;
+  patient_email: string | null;
+  patient_age: number | null;
+  patient_gender: string | null;
+  score: number | null;
+  risk_level: string | null;
+  flagged_for_review: boolean;
+  completion_time: number | null;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface Answer {
+  id: number;
+  response_id: number;
+  question_id: number;
+  value: string;
+  created_at: string;
+}
+
+interface CreateResponseData {
+  questionnaire_id: number;
+  patient_identifier?: string;
+  patient_name?: string;
+  patient_email?: string;
+  patient_age?: number;
+  patient_gender?: string;
+  score?: number;
+  risk_level?: string;
+  flagged_for_review?: boolean;
+  completion_time?: number;
+  answers: {
+    question_id: number;
+    value: string;
+  }[];
+}
+
+interface UpdateResponseData {
+  patient_identifier?: string;
+  patient_name?: string;
+  patient_email?: string;
+  patient_age?: number;
+  patient_gender?: string;
+  score?: number;
+  risk_level?: string;
+  flagged_for_review?: boolean;
+}
+```
+
+### Methods
+```typescript
+// Get all responses
+async getResponses(filters?: {
+  questionnaireId?: number;
+  startDate?: string;
+  endDate?: string;
+  riskLevel?: string;
+}): Promise<Response[]>
+
+// Get response by ID
+async getResponseById(id: number): Promise<Response>
+
+// Create a new response
+async createResponse(data: CreateResponseData): Promise<Response>
+
+// Update a response
+async updateResponse(id: number, data: UpdateResponseData): Promise<Response>
+
+// Delete a response
+async deleteResponse(id: number): Promise<{ message: string }>
+
+// Get answers for a response
+async getAnswers(responseId: number): Promise<Answer[]>
+
+// Export responses to CSV
+async exportResponsesToCSV(questionnaireId: number): Promise<Blob>
+```
+
+## Organization API
+
+### Types
+```typescript
+interface Organization {
+  id: number;
+  name: string;
+  description: string | null;
+  type: string | null;
+  contact_email: string | null;
+  contact_phone: string | null;
+  address: string | null;
+  logo_url: string | null;
+  settings: any | null;
+  created_at: string;
+  updated_at: string;
+}
+
+interface OrganizationMember {
+  id: number;
+  organization_id: number;
+  user_id: number;
+  role: string;
+  user: {
+    id: number;
+    name: string;
+    email: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+interface CreateOrganizationData {
+  name: string;
+  description?: string;
+  type?: string;
+  contact_email?: string;
+  contact_phone?: string;
+  address?: string;
+  logo_url?: string;
+  settings?: any;
+}
+
+interface AddMemberData {
+  user_id: number;
+  role: string;
+}
+```
+
+### Methods
+```typescript
+// Get all organizations
+async getOrganizations(): Promise<Organization[]>
+
+// Get organization by ID
+async getOrganizationById(id: number): Promise<Organization>
+
+// Create a new organization
+async createOrganization(data: CreateOrganizationData): Promise<Organization>
+
+// Update an organization
+async updateOrganization(id: number, data: Partial<CreateOrganizationData>): Promise<Organization>
+
+// Delete an organization
+async deleteOrganization(id: number): Promise<{ message: string }>
+
+// Get organization members
+async getOrganizationMembers(organizationId: number): Promise<OrganizationMember[]>
+
+// Add member to organization
+async addOrganizationMember(organizationId: number, data: AddMemberData): Promise<OrganizationMember>
+
+// Remove member from organization
+async removeOrganizationMember(organizationId: number, userId: number): Promise<{ message: string }>
+
+// Get organization questionnaires
+async getOrganizationQuestionnaires(organizationId: number): Promise<Questionnaire[]>
+```
+
+## Analytics API
+
+### Types
+```typescript
+interface DashboardMetrics {
+  total_questionnaires: number;
+  total_responses: number;
+  total_users: number;
+  total_organizations: number;
+  recent_responses: {
+    id: number;
+    questionnaire_title: string;
+    patient_name: string | null;
+    completed_at: string;
+  }[];
+  response_distribution: {
+    minimal: number;
+    low: number;
+    moderate: number;
+    high: number;
+  };
+}
+
+interface TimelineData {
+  date: string;
+  count: number;
+}
+
+interface DistributionData {
+  risk_levels: {
+    minimal: number;
+    low: number;
+    moderate: number;
+    high: number;
+  };
+  age_groups: {
+    [key: string]: number;
+  };
+  genders: {
+    [key: string]: number;
+  };
+}
+```
+
+### Methods
+```typescript
+// Get dashboard metrics
+async getDashboardMetrics(): Promise<DashboardMetrics>
+
+// Get response timeline data
+async getResponseTimeline(params?: {
+  period?: 'day' | 'week' | 'month' | 'year';
+  questionnaireId?: number;
+}): Promise<TimelineData[]>
+
+// Get response distribution data
+async getResponseDistribution(questionnaireId?: number): Promise<DistributionData>
+
+// Get user metrics
+async getUserMetrics(userId: number): Promise<any>
+```
+
+## AI Analysis API
+
+### Types
+```typescript
+interface AnalysisRequest {
+  response_id: number;
+  prompt?: string;
+}
+
+interface AnalysisResult {
+  analysis: string;
+  recommendations: string;
+  risk_assessment: string;
+}
+```
+
+### Methods
+```typescript
+// Analyze a response
+async analyzeResponse(data: AnalysisRequest): Promise<AnalysisResult>
+
+// Get analysis history
+async getAnalysisHistory(responseId: number): Promise<AnalysisResult[]>
+```
+
+## Email API
+
+### Types
+```typescript
+interface EmailTemplate {
+  id: number;
+  name: string;
+  subject: string;
+  body: string;
+  variables: string[];
+  created_at: string;
+  updated_at: string;
+}
+
+interface SendEmailData {
+  to: string | string[];
+  subject: string;
+  body?: string;
+  template_id?: number;
+  template_data?: Record<string, any>;
+}
+```
+
+### Methods
+```typescript
+// Send email
+async sendEmail(data: SendEmailData): Promise<{ message: string; email_id: string }>
+
+// Get email templates
+async getEmailTemplates(): Promise<EmailTemplate[]>
+
+// Create email template
+async createEmailTemplate(data: Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>): Promise<EmailTemplate>
+
+// Update email template
+async updateEmailTemplate(id: number, data: Partial<Omit<EmailTemplate, 'id' | 'created_at' | 'updated_at'>>): Promise<EmailTemplate>
+
+// Delete email template
+async deleteEmailTemplate(id: number): Promise<{ message: string }>
+```
+
+## Mock Data Service
+
+The mock data service provides simulated data for development and testing:
+
+```typescript
+// Mock user data
+const users = [
+  {
+    id: '1',
+    name: 'Admin User',
+    email: 'admin@example.com',
+    role: 'admin'
+  },
+  // More users...
+];
+
+// Mock questionnaire data
+const questionnaires = [
+  {
+    id: 1,
+    title: 'Health Assessment',
+    description: 'A general health assessment questionnaire',
+    // More properties...
+  },
+  // More questionnaires...
+];
+
+// Mock question data
+const questions = [
+  {
+    id: 1,
+    questionnaire_id: 1,
+    text: 'How would you rate your overall health?',
+    type: 'multiple_choice',
+    // More properties...
+  },
+  // More questions...
+];
+
+// Mock response data
+const responses = [
+  {
+    id: 1,
+    questionnaire_id: 1,
+    patient_name: 'John Doe',
+    // More properties...
+  },
+  // More responses...
+];
+
+// Mock methods
+function getQuestionnaires() {
+  return [...questionnaires];
+}
+
+function getQuestionnaireById(id: number) {
+  return questionnaires.find(q => q.id === id);
+}
+
+// More mock methods...
+```
+
+## Error Handling
+
+### Error Types
+```typescript
+class ApiError extends Error {
+  status: number;
+  
+  constructor(message: string, status: number) {
+    super(message);
+    this.status = status;
+    this.name = 'ApiError';
+  }
+}
+
+class AuthenticationError extends ApiError {
+  constructor(message: string) {
+    super(message, 401);
+    this.name = 'AuthenticationError';
+  }
+}
+
+class ForbiddenError extends ApiError {
+  constructor(message: string) {
+    super(message, 403);
+    this.name = 'ForbiddenError';
+  }
+}
+
+class NotFoundError extends ApiError {
+  constructor(message: string) {
+    super(message, 404);
+    this.name = 'NotFoundError';
+  }
+}
+```
+
+### Error Handling Middleware
+```typescript
+function handleApiError(error: any): never {
+  if (error.response) {
+    // The request was made and the server responded with a status code
+    // that falls out of the range of 2xx
+    const status = error.response.status;
+    const message = error.response.data?.message || 'An error occurred';
+    
+    if (status === 401) {
+      throw new AuthenticationError(message);
+    } else if (status === 403) {
+      throw new ForbiddenError(message);
+    } else if (status === 404) {
+      throw new NotFoundError(message);
+    } else {
+      throw new ApiError(message, status);
+    }
+  } else if (error.request) {
+    // The request was made but no response was received
+    throw new ApiError('No response from server', 0);
+  } else {
+    // Something happened in setting up the request that triggered an Error
+    throw new ApiError(error.message || 'Request setup error', 0);
+  }
+}
+```
+
+## Authentication Context
+
+The authentication context provides global access to authentication state:
+
+```typescript
+interface AuthContextType {
+  user: User | null;
+  isAuthenticated: boolean;
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<boolean>;
+  register: (name: string, email: string, password: string) => Promise<boolean>;
+  logout: () => Promise<void>;
+  error: string | null;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  isAuthenticated: false,
+  isLoading: true,
+  login: async () => false,
+  register: async () => false,
+  logout: async () => {},
+  error: null
+});
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Check if user is already logged in
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        if (token) {
+          const user = await authService.getCurrentUser();
+          setUser(user);
+        }
+      } catch (err) {
+        console.error('Auth check error:', err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, []);
+
+  // Login function
+  const login = async (email: string, password: string): Promise<boolean> => {
+    // Implementation
+  };
+
+  // Register function
+  const register = async (name: string, email: string, password: string): Promise<boolean> => {
+    // Implementation
+  };
+
+  // Logout function
+  const logout = async (): Promise<void> => {
+    // Implementation
+  };
+
+  // Context value
+  const value = {
+    user,
+    isAuthenticated: !!user,
+    isLoading,
+    login,
+    register,
+    logout,
+    error
+  };
+
+  return (
+    <AuthContext.Provider value={value}>
+      {children}
+    </AuthContext.Provider>
+  );
+};
+```
+
+## API Request Hooks
+
+Custom hooks for API requests:
+
+```typescript
+// Use questionnaire hook
+function useQuestionnaire(id: number) {
+  return useQuery<Questionnaire>({
+    queryKey: [`/api/questionnaires/${id}`],
+    queryFn: () => questionnaireService.getQuestionnaireById(id),
+    enabled: !!id
+  });
+}
+
+// Use questionnaires hook
+function useQuestionnaires() {
+  return useQuery<Questionnaire[]>({
+    queryKey: ['/api/questionnaires'],
+    queryFn: () => questionnaireService.getAllQuestionnaires()
+  });
+}
+
+// Use create questionnaire hook
+function useCreateQuestionnaire() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: (data: CreateQuestionnaireData) => questionnaireService.createQuestionnaire(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['/api/questionnaires'] });
+    }
+  });
+}
+
+// More custom hooks...
+```
+
+## Protected Routes
+
+Component for protecting routes that require authentication:
+
+```typescript
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+}
+
+function ProtectedRoute({ children }: ProtectedRouteProps) {
+  const { isAuthenticated, isLoading } = useAuth();
+  const [, navigate] = useLocation();
+
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      navigate('/login');
+    }
+  }, [isAuthenticated, isLoading, navigate]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? <>{children}</> : null;
+}
+```
+
+## API Interceptors
+
+Interceptors for handling common request/response patterns:
+
+```typescript
+// Request interceptor
+api.interceptors.request.use(
+  config => {
+    // Add token to request
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    
+    // Log request
+    console.log(`Making API request: ${config.method?.toUpperCase()} ${config.url}`);
+    
+    return config;
+  },
+  error => {
+    return Promise.reject(error);
+  }
+);
+
+// Response interceptor
+api.interceptors.response.use(
+  response => {
+    return response.data;
+  },
+  error => {
+    // Handle token expiration
+    if (error.response?.status === 401) {
+      localStorage.removeItem('token');
+      window.location.href = '/login';
+    }
+    
+    return Promise.reject(error);
+  }
+);
+```
+
+## Mock Mode
+
+The application supports a mock mode for development without a backend:
+
+```typescript
+// Check if mock mode is enabled
+const MOCK_MODE = import.meta.env.VITE_MOCK_MODE === 'true';
+
+// Example of a service method with mock support
+async function getQuestionnaires(): Promise<Questionnaire[]> {
+  if (MOCK_MODE) {
+    return mockDataService.getQuestionnaires();
+  }
+  
+  return api.get<Questionnaire[]>('/questionnaires');
+}
+```
+
+## Environment Variables
+
+Frontend API configuration is controlled by environment variables:
+
+```
+# API URLs
+VITE_API_URL=http://localhost:5000/api
+VITE_ENHANCED_API_URL=http://localhost:5001/api
+
+# Feature flags
+VITE_ENABLE_AI_FEATURES=true
+VITE_ENABLE_EMAIL_FEATURES=true
+
+# Mock mode
+VITE_MOCK_MODE=false
+
+# Analytics
+VITE_ANALYTICS_KEY=your-analytics-key
+
+# External services
+VITE_GEMINI_API_KEY=your-gemini-api-key
+```

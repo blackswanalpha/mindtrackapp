@@ -1,0 +1,237 @@
+# MindTrack Project Execution Guide
+
+## Project Overview
+MindTrack is a comprehensive mental health questionnaire and analysis platform that allows healthcare providers to create, distribute, and analyze mental health assessments. The system includes Google Form integration, QR code generation, and AI-powered response analysis.
+
+## System Requirements
+
+### Development Environment
+- Node.js (v16.x or higher)
+- npm (v8.x or higher)
+- PostgreSQL (v14.x or higher)
+- Git
+
+### Production Environment
+- Vercel (frontend hosting)
+- Vercel or similar serverless platform (backend hosting)
+- PostgreSQL database service (e.g., Neon, Supabase, Railway)
+
+## Project Setup
+
+### 1. Clone Repository
+```bash
+git clone https://github.com/your-username/mindtrack.git
+cd mindtrack
+```
+
+### 2. Backend Setup
+```bash
+# Navigate to server directory
+cd server
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env
+
+# Edit .env file with your database credentials and other settings
+# DATABASE_URL=postgresql://username:password@localhost:5432/mindtrack
+# JWT_SECRET=your_jwt_secret
+# PORT=5000
+
+# Run database migrations
+npm run migrate
+
+# Seed database with initial data (optional)
+npm run seed
+
+# Start development server
+npm run dev
+```
+
+### 3. Frontend Setup
+```bash
+# Navigate to frontend directory
+cd ../mindtrack
+
+# Install dependencies
+npm install
+
+# Create environment file
+cp .env.example .env.local
+
+# Edit .env.local file with your API URL
+# NEXT_PUBLIC_API_URL=http://localhost:5000/api
+
+# Start development server
+npm run dev
+```
+
+## Database Setup
+
+### 1. Create PostgreSQL Database
+```bash
+# Connect to PostgreSQL
+psql -U postgres
+
+# Create database
+CREATE DATABASE mindtrack;
+
+# Connect to the database
+\c mindtrack
+
+# Exit PostgreSQL
+\q
+```
+
+### 2. Run Migrations
+The migration scripts are located in `server/db/migrations`. Run them in sequence to set up the database schema.
+
+```bash
+# From server directory
+npm run migrate
+```
+
+## Development Workflow
+
+### 1. Backend Development
+1. Create/modify models in `server/models/`
+2. Create/modify services in `server/services/`
+3. Create/modify controllers in `server/controllers/`
+4. Create/modify routes in `server/routes/`
+5. Test API endpoints using Postman or similar tool
+6. Run tests: `npm test`
+
+### 2. Frontend Development
+1. Create/modify components in `mindtrack/src/components/`
+2. Create/modify pages in `mindtrack/src/app/`
+3. Create/modify API services in `mindtrack/src/lib/api-services/`
+4. Create/modify hooks in `mindtrack/src/hooks/`
+5. Test UI components and pages in browser
+6. Run tests: `npm test`
+
+## Deployment Process
+
+### 1. Backend Deployment to Vercel
+```bash
+# Navigate to server directory
+cd server
+
+# Login to Vercel
+vercel login
+
+# Deploy to Vercel
+vercel --prod
+```
+
+### 2. Frontend Deployment to Vercel
+```bash
+# Navigate to frontend directory
+cd ../mindtrack
+
+# Update environment variables for production
+# Create .env.production with:
+# NEXT_PUBLIC_API_URL=https://your-backend-url.vercel.app/api
+
+# Login to Vercel
+vercel login
+
+# Deploy to Vercel
+vercel --prod
+```
+
+### 3. Database Setup for Production
+1. Create a PostgreSQL database on a cloud provider (Neon, Supabase, Railway)
+2. Get the connection string
+3. Add the connection string to your backend environment variables on Vercel
+
+## Continuous Integration/Deployment
+
+### GitHub Actions Setup
+1. Create `.github/workflows/ci.yml` for continuous integration
+2. Create `.github/workflows/deploy.yml` for continuous deployment
+3. Configure secrets in GitHub repository settings:
+   - VERCEL_TOKEN
+   - VERCEL_ORG_ID
+   - VERCEL_PROJECT_ID
+   - DATABASE_URL
+   - JWT_SECRET
+
+## Monitoring and Maintenance
+
+### 1. Logging
+- Backend logs are available in Vercel dashboard
+- Use `console.log` for development debugging
+- Use structured logging in production
+
+### 2. Error Tracking
+- Implement error tracking with Sentry or similar service
+- Configure error boundaries in React components
+
+### 3. Performance Monitoring
+- Use Vercel Analytics for frontend performance
+- Implement database query monitoring
+
+## Backup and Recovery
+
+### 1. Database Backups
+- Configure automated backups for PostgreSQL database
+- Test restoration process regularly
+
+### 2. Code Backups
+- Maintain Git repository with regular pushes
+- Consider GitHub Actions for automated backups
+
+## Security Considerations
+
+### 1. Authentication
+- JWT-based authentication
+- Secure password storage with bcrypt
+- Implement rate limiting for login attempts
+
+### 2. Data Protection
+- Encrypt sensitive data in database
+- Implement proper access controls
+- Follow HIPAA guidelines for PHI
+
+### 3. API Security
+- Validate all inputs
+- Implement CORS properly
+- Use HTTPS for all communications
+
+## Troubleshooting Common Issues
+
+### 1. Database Connection Issues
+- Check connection string format
+- Verify network access to database
+- Check database user permissions
+
+### 2. API Errors
+- Check server logs for detailed error messages
+- Verify API endpoint URLs
+- Check authentication tokens
+
+### 3. Build Errors
+- Clear npm cache: `npm cache clean --force`
+- Delete node_modules and reinstall: `rm -rf node_modules && npm install`
+- Check for version conflicts in package.json
+
+## Project Maintenance
+
+### 1. Dependency Updates
+- Regularly update npm packages: `npm update`
+- Check for security vulnerabilities: `npm audit`
+- Test thoroughly after updates
+
+### 2. Feature Additions
+- Follow Git workflow for new features
+- Create feature branches
+- Submit pull requests for review
+- Merge to main branch after approval
+
+### 3. Bug Fixes
+- Create issue in issue tracker
+- Create fix branch
+- Submit pull request with fix
+- Add tests to prevent regression
