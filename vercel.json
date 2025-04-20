@@ -16,13 +16,7 @@
     }
   ],
   "env": {
-    "NODE_ENV": "production",
-    "DATABASE_URL": "@database_url",
-    "JWT_SECRET": "@jwt_secret",
-    "EMAIL_SERVICE": "@email_service",
-    "EMAIL_USER": "@email_user",
-    "EMAIL_PASSWORD": "@email_password",
-    "FRONTEND_URL": "@frontend_url"
+    "NODE_ENV": "production"
   },
   "routes": [
     {
