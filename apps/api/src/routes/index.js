@@ -13,6 +13,15 @@ const emailRoutes = require('./emailRoutes');
 const qrCodeRoutes = require('./qrCodeRoutes');
 const googleFormsRoutes = require('./googleFormsRoutes');
 const testRoutes = require('./testRoutes');
+const scoringRoutes = require('./scoringRoutes');
+const notificationRoutes = require('./notificationRoutes');
+const statisticsRoutes = require('./statisticsRoutes');
+const userMetricsRoutes = require('./userMetricsRoutes');
+
+// Health check endpoint
+router.get('/health', (_, res) => {
+  res.status(200).json({ status: 'ok' });
+});
 
 // Mount routes
 router.use('/auth', authRoutes);
@@ -26,11 +35,10 @@ router.use('/email', emailRoutes);
 router.use('/qr-codes', qrCodeRoutes);
 router.use('/google-forms', googleFormsRoutes);
 router.use('/test', testRoutes);
-
-// Health check route
-router.get('/health', (_, res) => {
-  res.status(200).json({ status: 'ok', message: 'API is running' });
-});
+router.use('/scoring', scoringRoutes);
+router.use('/notifications', notificationRoutes);
+router.use('/statistics', statisticsRoutes);
+router.use('/user-metrics', userMetricsRoutes);
 
 // API version route
 router.get('/', (_, res) => {

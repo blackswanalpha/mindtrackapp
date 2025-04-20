@@ -1,7 +1,17 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  Input,
+  TextArea,
+  Button,
+  Alert
+} from '@/components/common';
+import {
+  Save,
+  AlertTriangle
+} from 'lucide-react';
 import api from '@/services/api';
 
 type QuestionnaireFormProps = {
@@ -16,26 +26,42 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
   const [formData, setFormData] = useState({
     title: initialData?.title || '',
     description: initialData?.description || '',
-    type: initialData?.type || 'standard',
+    instructions: initialData?.instructions || '',
+    type: initialData?.type || 'assessment',
     category: initialData?.category || '',
     estimated_time: initialData?.estimated_time || '',
     is_active: initialData?.is_active ?? true,
     is_adaptive: initialData?.is_adaptive ?? false,
     is_qr_enabled: initialData?.is_qr_enabled ?? true,
     is_template: initialData?.is_template ?? false,
-    is_public: initialData?.is_public ?? false,
+    is_public: initialData?.is_public ?? true,
     allow_anonymous: initialData?.allow_anonymous ?? true,
     requires_auth: initialData?.requires_auth ?? false,
     max_responses: initialData?.max_responses || '',
-    expires_at: initialData?.expires_at
-      ? new Date(initialData.expires_at).toISOString().split('T')[0]
-      : '',
-    organization_id: initialData?.organization_id || '',
+    organization_id: initialData?.organization_id || 1,
   });
 
+  const [organizations, setOrganizations] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
   const router = useRouter();
+
+  // Fetch organizations for the dropdown
+  useEffect(() => {
+    const fetchOrganizations = async () => {
+      try {
+        if (typeof window !== 'undefined') {
+          const orgs = await api.organizations.getAll();
+          setOrganizations(orgs);
+        }
+      } catch (err) {
+        console.error('Failed to fetch organizations:', err);
+      }
+    };
+
+    fetchOrganizations();
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
@@ -54,6 +80,7 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       // Format data for API
@@ -61,77 +88,96 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
         ...formData,
         estimated_time: formData.estimated_time ? parseInt(formData.estimated_time) : undefined,
         max_responses: formData.max_responses ? parseInt(formData.max_responses) : undefined,
-        organization_id: formData.organization_id ? parseInt(formData.organization_id) : 1, // Default to organization ID 1
-        // Add mock user data since authentication is disabled
-        created_by_id: 1, // Mock user ID
+        organization_id: parseInt(formData.organization_id.toString()),
       };
 
       if (isEditing && initialData?.id) {
         // Update existing questionnaire
         await api.questionnaires.update(initialData.id, apiData);
+        setSuccess('Questionnaire updated successfully!');
+
+        // Wait a moment to show success message
+        setTimeout(() => {
+          router.push(`/questionnaires/${initialData.id}`);
+        }, 1500);
       } else {
         // Create new questionnaire
-        await api.questionnaires.create(apiData);
-      }
+        const newQuestionnaire = await api.questionnaires.create(apiData);
+        setSuccess('Questionnaire created successfully!');
 
-      // Redirect to questionnaires list
-      router.push('/questionnaires');
+        // Wait a moment to show success message
+        setTimeout(() => {
+          router.push(`/questionnaires/${newQuestionnaire.id}`);
+        }, 1500);
+      }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred while saving the questionnaire');
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg shadow-md">
-      <h2 className="text-2xl font-bold mb-6">
-        {isEditing ? 'Edit Questionnaire' : 'Create New Questionnaire'}
-      </h2>
-
+    <div>
       {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
+        <Alert type="error" message={error} className="mb-6" />
       )}
 
-      <form onSubmit={handleSubmit}>
+      {success && (
+        <Alert type="success" message={success} className="mb-6" />
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Title */}
-          <div className="col-span-2">
-            <label htmlFor="title" className="block text-gray-700 font-medium mb-2">
-              Title *
+          <div className="md:col-span-2">
+            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+              Title <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <Input
               id="title"
               name="title"
               value={formData.title}
               onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
+              placeholder="Enter questionnaire title"
             />
           </div>
 
           {/* Description */}
-          <div className="col-span-2">
-            <label htmlFor="description" className="block text-gray-700 font-medium mb-2">
+          <div className="md:col-span-2">
+            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
               Description
             </label>
-            <textarea
+            <TextArea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleChange}
-              rows={4}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              rows={3}
+              placeholder="Enter a brief description of the questionnaire"
+            />
+          </div>
+
+          {/* Instructions */}
+          <div className="md:col-span-2">
+            <label htmlFor="instructions" className="block text-sm font-medium text-gray-700 mb-1">
+              Instructions
+            </label>
+            <TextArea
+              id="instructions"
+              name="instructions"
+              value={formData.instructions}
+              onChange={handleChange}
+              rows={3}
+              placeholder="Enter instructions for respondents"
             />
           </div>
 
           {/* Type */}
           <div>
-            <label htmlFor="type" className="block text-gray-700 font-medium mb-2">
-              Type
+            <label htmlFor="type" className="block text-sm font-medium text-gray-700 mb-1">
+              Type <span className="text-red-500">*</span>
             </label>
             <select
               id="type"
@@ -139,207 +185,234 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
               value={formData.type}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
             >
-              <option value="standard">Standard</option>
               <option value="assessment">Assessment</option>
               <option value="survey">Survey</option>
               <option value="feedback">Feedback</option>
+              <option value="screening">Screening</option>
+              <option value="intake">Intake</option>
+              <option value="custom">Custom</option>
             </select>
           </div>
 
           {/* Category */}
           <div>
-            <label htmlFor="category" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="category" className="block text-sm font-medium text-gray-700 mb-1">
               Category
             </label>
-            <input
-              type="text"
+            <select
               id="category"
               name="category"
               value={formData.category}
               onChange={handleChange}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+            >
+              <option value="">Select a category</option>
+              <option value="Mental Health">Mental Health</option>
+              <option value="Depression">Depression</option>
+              <option value="Anxiety">Anxiety</option>
+              <option value="Well-being">Well-being</option>
+              <option value="Sleep">Sleep</option>
+              <option value="Stress">Stress</option>
+              <option value="General">General</option>
+              <option value="Other">Other</option>
+            </select>
           </div>
 
           {/* Estimated Time */}
           <div>
-            <label htmlFor="estimated_time" className="block text-gray-700 font-medium mb-2">
+            <label htmlFor="estimated_time" className="block text-sm font-medium text-gray-700 mb-1">
               Estimated Time (minutes)
             </label>
-            <input
-              type="number"
+            <Input
               id="estimated_time"
               name="estimated_time"
+              type="number"
+              min="1"
+              max="120"
               value={formData.estimated_time}
               onChange={handleChange}
-              min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g., 5"
             />
           </div>
 
-          {/* Max Responses */}
+          {/* Organization */}
           <div>
-            <label htmlFor="max_responses" className="block text-gray-700 font-medium mb-2">
-              Max Responses
+            <label htmlFor="organization_id" className="block text-sm font-medium text-gray-700 mb-1">
+              Organization <span className="text-red-500">*</span>
             </label>
-            <input
-              type="number"
-              id="max_responses"
-              name="max_responses"
-              value={formData.max_responses}
-              onChange={handleChange}
-              min="1"
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Expiration Date */}
-          <div>
-            <label htmlFor="expires_at" className="block text-gray-700 font-medium mb-2">
-              Expiration Date
-            </label>
-            <input
-              type="date"
-              id="expires_at"
-              name="expires_at"
-              value={formData.expires_at}
-              onChange={handleChange}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-
-          {/* Organization ID */}
-          <div>
-            <label htmlFor="organization_id" className="block text-gray-700 font-medium mb-2">
-              Organization ID
-            </label>
-            <input
-              type="number"
+            <select
               id="organization_id"
               name="organization_id"
               value={formData.organization_id}
               onChange={handleChange}
-              min="1"
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+              required
+            >
+              {organizations.length > 0 ? (
+                organizations.map((org) => (
+                  <option key={org.id} value={org.id}>
+                    {org.name}
+                  </option>
+                ))
+              ) : (
+                <option value="1">Mental Health Clinic</option>
+              )}
+            </select>
           </div>
 
-          {/* Checkboxes */}
-          <div className="col-span-2 grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Max Responses */}
+          <div>
+            <label htmlFor="max_responses" className="block text-sm font-medium text-gray-700 mb-1">
+              Maximum Responses (optional)
+            </label>
+            <Input
+              id="max_responses"
+              name="max_responses"
+              type="number"
+              min="1"
+              value={formData.max_responses}
+              onChange={handleChange}
+              placeholder="Leave blank for unlimited"
+            />
+          </div>
+        </div>
+
+        <div className="border-t border-gray-200 pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4">Settings</h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="flex items-center">
               <input
-                type="checkbox"
                 id="is_active"
                 name="is_active"
+                type="checkbox"
                 checked={formData.is_active}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="is_active" className="ml-2 block text-gray-700">
-                Active
+              <label htmlFor="is_active" className="ml-2 block text-sm text-gray-700">
+                Active (available for responses)
               </label>
             </div>
 
             <div className="flex items-center">
               <input
-                type="checkbox"
-                id="is_adaptive"
-                name="is_adaptive"
-                checked={formData.is_adaptive}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_adaptive" className="ml-2 block text-gray-700">
-                Adaptive
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_qr_enabled"
-                name="is_qr_enabled"
-                checked={formData.is_qr_enabled}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_qr_enabled" className="ml-2 block text-gray-700">
-                QR Code Enabled
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
-                id="is_template"
-                name="is_template"
-                checked={formData.is_template}
-                onChange={handleChange}
-                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-              />
-              <label htmlFor="is_template" className="ml-2 block text-gray-700">
-                Template
-              </label>
-            </div>
-
-            <div className="flex items-center">
-              <input
-                type="checkbox"
                 id="is_public"
                 name="is_public"
+                type="checkbox"
                 checked={formData.is_public}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="is_public" className="ml-2 block text-gray-700">
-                Public
+              <label htmlFor="is_public" className="ml-2 block text-sm text-gray-700">
+                Public (visible to all)
               </label>
             </div>
 
             <div className="flex items-center">
               <input
+                id="is_qr_enabled"
+                name="is_qr_enabled"
                 type="checkbox"
+                checked={formData.is_qr_enabled}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="is_qr_enabled" className="ml-2 block text-sm text-gray-700">
+                Enable QR code
+              </label>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="is_template"
+                name="is_template"
+                type="checkbox"
+                checked={formData.is_template}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="is_template" className="ml-2 block text-sm text-gray-700">
+                Save as template
+              </label>
+            </div>
+
+            <div className="flex items-center">
+              <input
                 id="allow_anonymous"
                 name="allow_anonymous"
+                type="checkbox"
                 checked={formData.allow_anonymous}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="allow_anonymous" className="ml-2 block text-gray-700">
-                Allow Anonymous Responses
+              <label htmlFor="allow_anonymous" className="ml-2 block text-sm text-gray-700">
+                Allow anonymous responses
               </label>
             </div>
 
             <div className="flex items-center">
               <input
-                type="checkbox"
                 id="requires_auth"
                 name="requires_auth"
+                type="checkbox"
                 checked={formData.requires_auth}
                 onChange={handleChange}
                 className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
               />
-              <label htmlFor="requires_auth" className="ml-2 block text-gray-700">
-                Requires Authentication
+              <label htmlFor="requires_auth" className="ml-2 block text-sm text-gray-700">
+                Require authentication
+              </label>
+            </div>
+
+            <div className="flex items-center">
+              <input
+                id="is_adaptive"
+                name="is_adaptive"
+                type="checkbox"
+                checked={formData.is_adaptive}
+                onChange={handleChange}
+                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+              />
+              <label htmlFor="is_adaptive" className="ml-2 block text-sm text-gray-700">
+                Enable adaptive questions
               </label>
             </div>
           </div>
         </div>
 
-        <div className="mt-8 flex justify-end space-x-4">
-          <button
+        {formData.requires_auth && !formData.allow_anonymous && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <AlertTriangle className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  Warning: You have enabled required authentication but disabled anonymous responses.
+                  Users will need to be logged in to respond to this questionnaire.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="flex justify-end space-x-4">
+          <Button
             type="button"
+            variant="light"
             onClick={() => router.back()}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             Cancel
-          </button>
-          <button
+          </Button>
+          <Button
             type="submit"
+            variant="primary"
             disabled={isLoading}
-            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed"
           >
+            <Save className="h-4 w-4 mr-2" />
             {isLoading
               ? isEditing
                 ? 'Updating...'
@@ -347,7 +420,7 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
               : isEditing
               ? 'Update Questionnaire'
               : 'Create Questionnaire'}
-          </button>
+          </Button>
         </div>
       </form>
     </div>

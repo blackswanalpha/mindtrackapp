@@ -13,7 +13,11 @@ export { default as Pagination } from './Pagination';
 export { default as RadioGroup } from './RadioGroup';
 export { default as Select } from './Select';
 export { default as Table } from './Table';
-export { default as Tabs } from './Tabs';
+export { default as Tabs, TabsList, TabsTrigger, TabsContent } from './Tabs';
 export { default as TextArea } from './TextArea';
 export { default as Toast } from './Toast';
 export { default as ProgressBar } from './ProgressBar';
+
+// Modern UI components
+export { default as ModernCard } from './ModernCard';
+export { default as ModernButton } from './ModernButton';

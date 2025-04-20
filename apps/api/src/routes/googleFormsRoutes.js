@@ -1,18 +1,18 @@
 const express = require('express');
 const router = express.Router();
 const googleFormsController = require('../controllers/googleFormsController');
-const { authenticate } = require('../middleware/auth');
+const { auth } = require('../middleware/auth');
 
 // Endpoint to manually trigger form data import
-router.post('/import', authenticate, googleFormsController.importFormResponses);
+router.post('/import', auth, googleFormsController.importFormResponses);
 
 // Endpoint to get all form responses
-router.get('/', authenticate, googleFormsController.getAllResponses);
-
-// Endpoint to get a single form response by ID
-router.get('/:id', authenticate, googleFormsController.getResponseById);
+router.get('/', auth, googleFormsController.getAllResponses);
 
 // Endpoint to get form response statistics
-router.get('/statistics', authenticate, googleFormsController.getResponseStatistics);
+router.get('/statistics', auth, googleFormsController.getResponseStatistics);
+
+// Endpoint to get a single form response by ID
+router.get('/:id', auth, googleFormsController.getResponseById);
 
 module.exports = router;

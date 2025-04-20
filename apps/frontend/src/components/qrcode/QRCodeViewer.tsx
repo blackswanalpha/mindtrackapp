@@ -18,20 +18,35 @@ const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
   const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>('');
-  
+
   // Generate QR code on mount
   useEffect(() => {
     generateQRCode();
   }, [uniqueCode]);
-  
-  // Generate QR code
+
+  // Generate QR code (mock implementation)
   const generateQRCode = async () => {
     setIsLoading(true);
     setError('');
-    
+
     try {
-      const response = await apiClient.get(`/qr-codes/responses/${uniqueCode}`);
-      setQrCodeUrl(response.data.qrCode);
+      // Simulate API delay
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      // Generate a mock QR code data URL
+      // In a real implementation, this would come from the API
+      // This is a placeholder SVG QR code as data URL
+      const mockQrCodeUrl = `data:image/svg+xml;base64,${btoa(
+        `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+          <rect width="200" height="200" fill="white"/>
+          <rect x="50" y="50" width="100" height="100" fill="black"/>
+          <rect x="60" y="60" width="80" height="80" fill="white"/>
+          <rect x="70" y="70" width="60" height="60" fill="black"/>
+          <text x="100" y="180" text-anchor="middle" font-size="12">${uniqueCode}</text>
+        </svg>`
+      )}`;
+
+      setQrCodeUrl(mockQrCodeUrl);
     } catch (error) {
       const errorMessage = handleApiError(error, 'Failed to generate QR code');
       setError(errorMessage);
@@ -39,19 +54,17 @@ const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
       setIsLoading(false);
     }
   };
-  
-  // Download QR code
+
+  // Download QR code (mock implementation)
   const handleDownload = async () => {
     try {
-      const response = await apiClient.get(`/qr-codes/responses/${uniqueCode}/download`, {
-        responseType: 'blob'
-      });
-      
-      // Create download link
-      const url = window.URL.createObjectURL(new Blob([response.data]));
+      // In a real implementation, we would download from the API
+      // For now, we'll just download the SVG we created
+
+      // Create a download link for the current QR code
       const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `response-${uniqueCode}-qr.png`);
+      link.href = qrCodeUrl;
+      link.setAttribute('download', `response-${uniqueCode}-qr.svg`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -60,11 +73,11 @@ const QRCodeViewer: React.FC<QRCodeViewerProps> = ({
       setError(errorMessage);
     }
   };
-  
+
   return (
     <div className={`bg-white rounded-lg shadow-md p-4 ${className}`}>
       <h3 className="text-lg font-medium text-gray-900 mb-4">Response QR Code</h3>
-      
+
       <div className="flex flex-col items-center">
         {isLoading ? (
           <Loading size="medium" message="Generating QR code..." />

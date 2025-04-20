@@ -20,22 +20,59 @@ const QuestionnaireList: React.FC = () => {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const fetchQuestionnaires = async () => {
-      try {
-        setLoading(true);
-        // Use axios directly with the full URL to avoid path issues
-        const response = await axios.get('http://localhost:3001/api/v1/questionnaires');
-        setQuestionnaires(response.data.questionnaires);
-        setError('');
-      } catch (err) {
-        console.error('Error fetching questionnaires:', err);
-        setError('Failed to load questionnaires. Please try again later.');
-      } finally {
-        setLoading(false);
+    // Mock data for questionnaires
+    const mockQuestionnaires: Questionnaire[] = [
+      {
+        id: 1,
+        title: 'Depression Assessment',
+        description: 'A comprehensive assessment for depression symptoms based on PHQ-9.',
+        instructions: 'Please answer all questions honestly based on how you felt in the past 2 weeks.',
+        created_at: '2023-04-15T10:30:00Z'
+      },
+      {
+        id: 2,
+        title: 'Anxiety Screening',
+        description: 'Screening tool for anxiety disorders based on GAD-7 criteria.',
+        instructions: 'Rate how often you have been bothered by the following problems over the last 2 weeks.',
+        created_at: '2023-04-10T14:20:00Z'
+      },
+      {
+        id: 3,
+        title: 'Well-being Check',
+        description: 'General assessment of mental well-being and life satisfaction.',
+        instructions: 'Please indicate how much you agree with each statement.',
+        created_at: '2023-04-05T09:15:00Z'
+      },
+      {
+        id: 4,
+        title: 'Stress Evaluation',
+        description: 'Evaluation of current stress levels and coping mechanisms.',
+        instructions: 'Answer based on your experiences in the past month.',
+        created_at: '2023-04-01T11:45:00Z'
+      },
+      {
+        id: 5,
+        title: 'Sleep Quality Assessment',
+        description: 'Assessment of sleep patterns and quality based on PSQI.',
+        instructions: 'Please answer the following questions about your sleep habits.',
+        created_at: '2023-03-28T16:30:00Z'
+      },
+      {
+        id: 6,
+        title: 'Mood Tracker',
+        description: 'Daily mood tracking questionnaire for monitoring emotional patterns.',
+        instructions: 'Rate your mood and emotions for today.',
+        created_at: '2023-03-25T08:20:00Z'
       }
-    };
+    ];
 
-    fetchQuestionnaires();
+    // Simulate API call delay
+    const timer = setTimeout(() => {
+      setQuestionnaires(mockQuestionnaires);
+      setLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timer);
   }, []);
 
   // Animation variants

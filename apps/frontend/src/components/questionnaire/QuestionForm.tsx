@@ -34,7 +34,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value, type } = e.target;
-    
+
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
       setFormData((prev) => ({ ...prev, [name]: checked }));
@@ -60,10 +60,13 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
     }));
   };
 
+  const [success, setSuccess] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
+    setSuccess(null);
 
     try {
       // Format data for API
@@ -75,16 +78,26 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
 
       if (isEditing && initialData?.id) {
         // Update existing question
-        await api.questions.update(initialData.id, apiData);
+        if (typeof window !== 'undefined') {
+          await api.questions.update(initialData.id, apiData);
+          setSuccess('Question updated successfully!');
+        }
       } else {
         // Create new question
-        await api.questions.create(questionnaireId, apiData);
+        if (typeof window !== 'undefined') {
+          await api.questions.create(questionnaireId, apiData);
+          setSuccess('Question created successfully!');
+        }
       }
+
+      // Wait a moment to show success message
+      await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Redirect to questionnaire questions page
       router.push(`/questionnaires/${questionnaireId}/questions`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred');
+      setError(err instanceof Error ? err.message : 'An error occurred while saving the question');
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -102,6 +115,12 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
+        </div>
+      )}
+
+      {success && (
+        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+          {success}
         </div>
       )}
 
@@ -214,7 +233,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
           {showOptions && (
             <div className="col-span-2">
               <label className="block text-gray-700 font-medium mb-2">Options</label>
-              
+
               <div className="mb-2 flex">
                 <input
                   type="text"
@@ -231,7 +250,7 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
                   Add
                 </button>
               </div>
-              
+
               {formData.options.length > 0 ? (
                 <ul className="border border-gray-300 rounded-md divide-y divide-gray-300">
                   {formData.options.map((option: any, index: number) => (

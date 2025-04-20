@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button, Card, Loading } from '@/components/common';
 import { useRouter } from 'next/navigation';
-import { useToast } from '@/hooks/useToast';
+// import { useToast } from '@/hooks/useToast';
 
 type QRCodeScannerProps = {
   onScan?: (result: string) => void;
@@ -18,7 +18,6 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
   const [error, setError] = useState<string>('');
   const [hasCamera, setHasCamera] = useState<boolean>(true);
   const router = useRouter();
-  const { showToast } = useToast();
 
   // Start scanning when component mounts
   useEffect(() => {
@@ -110,7 +109,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
         if (onScan) {
           onScan(decodedText);
         } else {
-          showToast('info', 'QR code scanned, but not recognized as a MindTrack QR code.');
+          alert('QR code scanned, but not recognized as a MindTrack QR code.');
         }
       }
     } catch (error) {
@@ -118,7 +117,7 @@ const QRCodeScanner: React.FC<QRCodeScannerProps> = ({
       if (onScan) {
         onScan(decodedText);
       } else {
-        showToast('info', 'QR code scanned, but not recognized as a valid URL.');
+        alert('QR code scanned, but not recognized as a valid URL.');
       }
     }
   };

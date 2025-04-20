@@ -31,33 +31,43 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
 
   useEffect(() => {
     const fetchResponses = async () => {
-      setIsLoading(true);
-      setError(null);
+      if (!questionnaireId) {
+        setError('No questionnaire ID provided');
+        setIsLoading(false);
+        return;
+      }
 
       try {
-        let params: any = {};
+        setIsLoading(true);
+        setError(null);
 
-        // Apply questionnaire filter if provided
-        if (questionnaireId) {
-          params.questionnaire_id = questionnaireId;
-        }
+        // Fetch responses for the specific questionnaire
+        const data = await api.responses.getByQuestionnaire(questionnaireId);
 
         // Apply risk/flag filters
+        let filteredResponses = [...data];
         if (filter === 'flagged') {
-          params.flagged_for_review = true;
+          filteredResponses = filteredResponses.filter(r => r.flagged_for_review);
         } else if (filter === 'high_risk') {
-          params.risk_level = 'high';
+          filteredResponses = filteredResponses.filter(r => r.risk_level === 'high' || r.risk_level === 'severe' || r.risk_level === 'moderately severe');
         } else if (filter === 'medium_risk') {
-          params.risk_level = 'medium';
+          filteredResponses = filteredResponses.filter(r => r.risk_level === 'medium' || r.risk_level === 'moderate');
         } else if (filter === 'low_risk') {
-          params.risk_level = 'low';
+          filteredResponses = filteredResponses.filter(r => r.risk_level === 'low' || r.risk_level === 'minimal' || r.risk_level === 'mild');
         }
 
-        const response = await api.responses.getAll(params);
-        setResponses(response.responses);
+        // Sort responses by completion date (newest first)
+        filteredResponses.sort((a, b) => {
+          const dateA = new Date(a.completed_at).getTime();
+          const dateB = new Date(b.completed_at).getTime();
+          return dateB - dateA;
+        });
+
+        setResponses(filteredResponses);
+        setIsLoading(false);
       } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch responses');
-      } finally {
+        console.error('Error fetching responses:', err);
+        setError(err instanceof Error ? err.message : 'Failed to load responses');
         setIsLoading(false);
       }
     };
@@ -67,7 +77,9 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
 
   const handleFlag = async (id: number, flagged: boolean) => {
     try {
-      await api.responses.flag(id, flagged);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 300));
+
       // Update response in state
       setResponses((prev) =>
         prev.map((r) => (r.id === id ? { ...r, flagged_for_review: flagged } : r))

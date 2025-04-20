@@ -86,13 +86,13 @@ const HeroSection: React.FC = () => {
             className="mt-10 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-x-4 sm:space-y-0"
             variants={itemVariants}
           >
-            <Link href="/dashboard">
+            <Link href="/questionnaires">
               <motion.button
                 className="flex items-center justify-center rounded-md bg-blue-600 px-6 py-3 text-base font-medium text-white shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Go to Dashboard
+                View Questionnaires
                 <ArrowRight className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
@@ -106,23 +106,13 @@ const HeroSection: React.FC = () => {
                 <ScanLine className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
-            <Link href="/test">
+            <Link href="/questionnaires/1">
               <motion.button
                 className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
-                Test Environment
-                <Beaker className="ml-2 h-4 w-4" />
-              </motion.button>
-            </Link>
-            <Link href="/test">
-              <motion.button
-                className="flex items-center justify-center rounded-md border border-gray-300 bg-white px-6 py-3 text-base font-medium text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                Test Environment
+                Sample Questionnaire
                 <Beaker className="ml-2 h-4 w-4" />
               </motion.button>
             </Link>
