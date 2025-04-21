@@ -5,6 +5,10 @@
     "silent": false
   },
   "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "apps/frontend/.next",
+  "framework": "nextjs",
+  "installCommand": "npm install",
   "builds": [
     {
       "src": "apps/frontend/package.json",
