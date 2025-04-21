@@ -5,7 +5,7 @@
   "installCommand": "npm install",
   "outputDirectory": ".next",
   "env": {
-    "NEXT_PUBLIC_API_URL": "https://mindtrackapp-3hecu6ooe-victor-mbuguas-projects.vercel.app/api/v1",
+    "NEXT_PUBLIC_API_URL": "https://mindtrackapp-fig3l8569-victor-mbuguas-projects.vercel.app/api/v1",
     "USE_MOCK_DATA": "false"
   }
 }
