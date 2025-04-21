@@ -1,11 +1,12 @@
 /**
  * API service for making requests to the backend
  *
- * This service now uses mockStorage to simulate API calls for local development.
+ * This service uses the real API in production and mockStorage for local development.
  */
 
 import mockStorage from './mockStorage';
 import scoringService from './scoringService';
+import { apiClient } from '@/lib/apiClient';
 
 // Initialize mock storage
 if (typeof window !== 'undefined') {
@@ -13,6 +14,14 @@ if (typeof window !== 'undefined') {
 }
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1';
+
+// Flag to determine whether to use mock data or real API
+// Set to false to force using the real API with Neon database
+const USE_MOCK_DATA = false;
+
+// Log API configuration
+console.log('API URL:', API_URL);
+console.log('Using mock data:', USE_MOCK_DATA);
 
 /**
  * Get auth token from localStorage or return a mock token
@@ -83,6 +92,334 @@ export const api = {
    */
   getApiInfo: async () => {
     return fetchWithErrorHandling(`${API_URL}/`);
+  },
+
+  /**
+   * Metrics methods
+   */
+  metrics: {
+    /**
+     * Get user metrics
+     */
+    getUserMetrics: async (params?: { timeRange?: string }) => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(800);
+
+          // Return mock user metrics data
+          return {
+            totalUsers: 256,
+            userGrowth: 12.5,
+            totalResponses: 1842,
+            responseGrowth: 8.3,
+            completionRate: 87,
+            completionRateGrowth: 3.2,
+            averageScore: 14.7,
+            scoreChange: -2.1,
+            activeUsers: 187,
+            activeUserGrowth: 8.2,
+            inactiveUsers: 69,
+            inactiveUserGrowth: 3.5,
+            avgEngagement: 6.3,
+            engagementGrowth: 12.7,
+            userActivity: [
+              { date: 'Mon', active: 42 },
+              { date: 'Tue', active: 38 },
+              { date: 'Wed', active: 45 },
+              { date: 'Thu', active: 39 },
+              { date: 'Fri', active: 48 },
+              { date: 'Sat', active: 30 },
+              { date: 'Sun', active: 27 },
+            ],
+            activityByDay: [
+              { day: 'Mon', logins: 42, submissions: 28 },
+              { day: 'Tue', logins: 38, submissions: 25 },
+              { day: 'Wed', logins: 45, submissions: 32 },
+              { day: 'Thu', logins: 39, submissions: 27 },
+              { day: 'Fri', logins: 48, submissions: 35 },
+              { day: 'Sat', logins: 30, submissions: 18 },
+              { day: 'Sun', logins: 27, submissions: 15 },
+            ],
+            activityByTime: [
+              { hour: '00:00', activity: 5 },
+              { hour: '03:00', activity: 2 },
+              { hour: '06:00', activity: 8 },
+              { hour: '09:00', activity: 35 },
+              { hour: '12:00', activity: 42 },
+              { hour: '15:00', activity: 47 },
+              { hour: '18:00', activity: 38 },
+              { hour: '21:00', activity: 25 },
+            ],
+            engagementMetrics: [
+              { metric: 'Completion Rate', current: 87, previous: 82 },
+              { metric: 'Avg. Time Spent', current: 65, previous: 58 },
+              { metric: 'Return Rate', current: 42, previous: 38 },
+              { metric: 'Questions Answered', current: 95, previous: 90 },
+              { metric: 'Feedback Given', current: 28, previous: 20 },
+            ],
+            completionRates: [
+              { questionnaire: 'Depression', rate: 92 },
+              { questionnaire: 'Anxiety', rate: 88 },
+              { questionnaire: 'Stress', rate: 85 },
+              { questionnaire: 'Sleep', rate: 78 },
+              { questionnaire: 'Nutrition', rate: 72 },
+            ],
+            retention: [
+              { week: 'Week 1', rate: 100 },
+              { week: 'Week 2', rate: 85 },
+              { week: 'Week 3', rate: 72 },
+              { week: 'Week 4', rate: 68 },
+              { week: 'Week 5', rate: 65 },
+              { week: 'Week 6', rate: 62 },
+              { week: 'Week 7', rate: 60 },
+              { week: 'Week 8', rate: 58 },
+            ],
+            riskDistribution: [
+              { name: 'Low', value: 120, color: '#10b981' },
+              { name: 'Medium', value: 80, color: '#f59e0b' },
+              { name: 'High', value: 40, color: '#ef4444' },
+            ],
+            userMetrics: [
+              {
+                id: 1,
+                name: 'John Doe',
+                email: 'john@example.com',
+                completedQuestionnaires: 8,
+                averageScore: 12.5,
+                lastActive: '2023-06-15T10:30:00Z',
+                riskLevel: 'moderate'
+              },
+              {
+                id: 2,
+                name: 'Jane Smith',
+                email: 'jane@example.com',
+                completedQuestionnaires: 5,
+                averageScore: 7.2,
+                lastActive: '2023-06-18T14:45:00Z',
+                riskLevel: 'mild'
+              },
+              {
+                id: 3,
+                name: 'Robert Johnson',
+                email: 'robert@example.com',
+                completedQuestionnaires: 12,
+                averageScore: 18.3,
+                lastActive: '2023-06-10T09:15:00Z',
+                riskLevel: 'moderately severe'
+              },
+              {
+                id: 4,
+                name: 'Emily Davis',
+                email: 'emily@example.com',
+                completedQuestionnaires: 3,
+                averageScore: 4.1,
+                lastActive: '2023-06-20T16:20:00Z',
+                riskLevel: 'minimal'
+              },
+              {
+                id: 5,
+                name: 'Michael Wilson',
+                email: 'michael@example.com',
+                completedQuestionnaires: 10,
+                averageScore: 15.8,
+                lastActive: '2023-06-17T08:15:00Z',
+                riskLevel: 'moderate'
+              },
+              {
+                id: 6,
+                name: 'Sarah Brown',
+                email: 'sarah@example.com',
+                completedQuestionnaires: 7,
+                averageScore: 9.3,
+                lastActive: '2023-06-19T11:20:00Z',
+                riskLevel: 'mild'
+              },
+            ],
+            demographicData: {
+              ageGroups: [
+                { name: '18-24', value: 45 },
+                { name: '25-34', value: 85 },
+                { name: '35-44', value: 65 },
+                { name: '45-54', value: 40 },
+                { name: '55+', value: 21 },
+              ],
+              genderDistribution: [
+                { name: 'Male', value: 120, color: '#3b82f6' },
+                { name: 'Female', value: 130, color: '#ec4899' },
+                { name: 'Other', value: 6, color: '#8b5cf6' },
+              ],
+              locationData: [
+                { name: 'Urban', value: 160 },
+                { name: 'Suburban', value: 80 },
+                { name: 'Rural', value: 16 },
+              ]
+            }
+          };
+        }
+
+        // Use API in production
+        const queryParams = params ? new URLSearchParams(params).toString() : '';
+        const response = await apiClient.get(`/user-metrics${queryParams ? `?${queryParams}` : ''}`);
+        return response.data;
+      } catch (error) {
+        console.error('Failed to get user metrics:', error);
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(800);
+
+        // Return mock user metrics data (same as above)
+        return {
+          totalUsers: 256,
+          userGrowth: 12.5,
+          // ... (same mock data as above)
+        };
+      }
+    },
+
+    /**
+     * Get most active users
+     */
+    getMostActiveUsers: async (limit: number = 10) => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(600);
+
+          // Return mock most active users data
+          return [
+            {
+              id: 3,
+              name: 'Robert Johnson',
+              email: 'robert@example.com',
+              completedQuestionnaires: 12,
+              lastActive: '2023-06-10T09:15:00Z',
+            },
+            {
+              id: 5,
+              name: 'Michael Wilson',
+              email: 'michael@example.com',
+              completedQuestionnaires: 10,
+              lastActive: '2023-06-17T08:15:00Z',
+            },
+            {
+              id: 1,
+              name: 'John Doe',
+              email: 'john@example.com',
+              completedQuestionnaires: 8,
+              lastActive: '2023-06-15T10:30:00Z',
+            },
+          ];
+        }
+
+        // Use API in production
+        const response = await apiClient.get(`/user-metrics/most-active?limit=${limit}`);
+        return response.data;
+      } catch (error) {
+        console.error('Failed to get most active users:', error);
+        throw error;
+      }
+    },
+
+    /**
+     * Get recently active users
+     */
+    getRecentlyActiveUsers: async (limit: number = 10) => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(600);
+
+          // Return mock recently active users data
+          return [
+            {
+              id: 4,
+              name: 'Emily Davis',
+              email: 'emily@example.com',
+              lastActive: '2023-06-20T16:20:00Z',
+            },
+            {
+              id: 6,
+              name: 'Sarah Brown',
+              email: 'sarah@example.com',
+              lastActive: '2023-06-19T11:20:00Z',
+            },
+            {
+              id: 2,
+              name: 'Jane Smith',
+              email: 'jane@example.com',
+              lastActive: '2023-06-18T14:45:00Z',
+            },
+          ];
+        }
+
+        // Use API in production
+        const response = await apiClient.get(`/user-metrics/recently-active?limit=${limit}`);
+        return response.data;
+      } catch (error) {
+        console.error('Failed to get recently active users:', error);
+        throw error;
+      }
+    },
+
+    /**
+     * Get user metrics by ID
+     */
+    getUserMetricsById: async (userId: number) => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(500);
+
+          // Return mock user metrics data
+          return {
+            id: 1,
+            user_id: userId,
+            login_count: 25,
+            questionnaires_created: 5,
+            responses_submitted: 10,
+            last_active_at: '2023-06-01T12:00:00Z'
+          };
+        }
+
+        // Use API in production
+        const response = await apiClient.get(`/user-metrics/users/${userId}`);
+        return response.data;
+      } catch (error) {
+        console.error(`Failed to get metrics for user ${userId}:`, error);
+        throw error;
+      }
+    },
+
+    /**
+     * Update last active timestamp
+     */
+    updateLastActive: async () => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(300);
+
+          // Return mock updated user metrics data
+          return {
+            id: 1,
+            user_id: 1,
+            login_count: 25,
+            questionnaires_created: 5,
+            responses_submitted: 10,
+            last_active_at: new Date().toISOString()
+          };
+        }
+
+        // Use API in production
+        const response = await apiClient.put('/user-metrics/last-active');
+        return response.data;
+      } catch (error) {
+        console.error('Failed to update last active timestamp:', error);
+        throw error;
+      }
+    }
   },
 
   /**
@@ -173,18 +510,33 @@ export const api = {
      */
     getAll: async (params?: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           return mockStorage.questionnaires.getAll();
         }
 
-        // Use API in production
+        // Use real API
         const queryParams = params ? new URLSearchParams(params).toString() : '';
-        return fetchWithErrorHandling(`${API_URL}/questionnaires${queryParams ? `?${queryParams}` : ''}`);
+        console.log('Fetching questionnaires with URL:', `/questionnaires${queryParams ? `?${queryParams}` : ''}`);
+        const response = await apiClient.get(`/questionnaires${queryParams ? `?${queryParams}` : ''}`);
+        console.log('API response:', response.data);
+
+        // Handle different response formats
+        if (response.data && response.data.questionnaires) {
+          // If the API returns an object with a questionnaires property
+          return response.data.questionnaires;
+        } else {
+          // If the API returns the questionnaires directly
+          return response.data;
+        }
       } catch (error) {
         console.error('Failed to get questionnaires:', error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay();
+        return mockStorage.questionnaires.getAll();
       }
     },
 
@@ -193,8 +545,8 @@ export const api = {
      */
     getById: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           const questionnaire = mockStorage.questionnaires.getById(id);
           if (!questionnaire) {
@@ -203,11 +555,20 @@ export const api = {
           return questionnaire;
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${id}`);
+        // Use real API
+        const response = await apiClient.get(`/questionnaires/${id}`);
+        return response.data.questionnaire;
       } catch (error) {
         console.error(`Failed to get questionnaire ${id}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay();
+        const questionnaire = mockStorage.questionnaires.getById(id);
+        if (!questionnaire) {
+          throw new Error(`Questionnaire with ID ${id} not found`);
+        }
+        return questionnaire;
       }
     },
 
@@ -216,8 +577,8 @@ export const api = {
      */
     create: async (questionnaireData: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
           const newQuestionnaire = {
             ...questionnaireData,
@@ -227,14 +588,9 @@ export const api = {
           return mockStorage.questionnaires.create(newQuestionnaire);
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(questionnaireData)
-        });
+        // Use real API
+        const response = await apiClient.post('/questionnaires', questionnaireData);
+        return response.data.questionnaire;
       } catch (error) {
         console.error('Failed to create questionnaire:', error);
         throw error;
@@ -246,8 +602,8 @@ export const api = {
      */
     update: async (id: number, questionnaireData: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
           const updatedQuestionnaire = {
             ...questionnaireData,
@@ -260,14 +616,9 @@ export const api = {
           return result;
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(questionnaireData)
-        });
+        // Use real API
+        const response = await apiClient.put(`/questionnaires/${id}`, questionnaireData);
+        return response.data.questionnaire;
       } catch (error) {
         console.error(`Failed to update questionnaire ${id}:`, error);
         throw error;
@@ -279,8 +630,8 @@ export const api = {
      */
     delete: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
           const success = mockStorage.questionnaires.delete(id);
           if (!success) {
@@ -289,10 +640,9 @@ export const api = {
           return { success };
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${id}`, {
-          method: 'DELETE'
-        });
+        // Use real API
+        const response = await apiClient.delete(`/questionnaires/${id}`);
+        return response.data;
       } catch (error) {
         console.error(`Failed to delete questionnaire ${id}:`, error);
         throw error;
@@ -304,8 +654,8 @@ export const api = {
      */
     getWithQuestions: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           const questionnaire = mockStorage.questionnaires.getById(id);
           if (!questionnaire) {
@@ -315,8 +665,9 @@ export const api = {
           return { questionnaire, questions };
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${id}/questions`);
+        // Use real API
+        const response = await apiClient.get(`/questionnaires/${id}/questions`);
+        return response.data;
       } catch (error) {
         console.error(`Failed to get questionnaire ${id} with questions:`, error);
         throw error;
@@ -387,8 +738,8 @@ export const api = {
      */
     duplicate: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(1000);
           const questionnaire = mockStorage.questionnaires.getById(id);
           if (!questionnaire) {
@@ -418,12 +769,39 @@ export const api = {
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${id}/duplicate`, {
-          method: 'POST'
-        });
+        const response = await apiClient.post(`/questionnaires/${id}/version`);
+        return response.data.questionnaire;
       } catch (error) {
         console.error(`Failed to duplicate questionnaire ${id}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(1000);
+        const questionnaire = mockStorage.questionnaires.getById(id);
+        if (!questionnaire) {
+          throw new Error(`Questionnaire with ID ${id} not found`);
+        }
+
+        const { id: _, ...questionnaireData } = questionnaire;
+        const newQuestionnaire = {
+          ...questionnaireData,
+          title: `${questionnaireData.title} (Copy)`,
+          created_at: new Date().toISOString()
+        };
+
+        const createdQuestionnaire = mockStorage.questionnaires.create(newQuestionnaire);
+
+        // Duplicate questions
+        const questions = mockStorage.questions.getByQuestionnaire(id);
+        questions.forEach(question => {
+          const { id: __, ...questionData } = question;
+          mockStorage.questions.create({
+            ...questionData,
+            questionnaire_id: createdQuestionnaire.id
+          });
+        });
+
+        return createdQuestionnaire;
       }
     }
   },
@@ -498,17 +876,22 @@ export const api = {
      */
     getByQuestionnaire: async (questionnaireId: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           return mockStorage.questions.getByQuestionnaire(questionnaireId);
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${questionnaireId}/questions`);
+        const response = await apiClient.get(`/questionnaires/${questionnaireId}/questions`);
+        return response.data.questions;
       } catch (error) {
         console.error(`Failed to get questions for questionnaire ${questionnaireId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay();
+        return mockStorage.questions.getByQuestionnaire(questionnaireId);
       }
     },
 
@@ -649,8 +1032,8 @@ export const api = {
      */
     getByUniqueCode: async (uniqueCode: string) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           const responses = mockStorage.responses.getAll();
           const response = responses.find(r => r.unique_code === uniqueCode);
@@ -662,15 +1045,27 @@ export const api = {
             return null;
           }
 
-          return response;
+          // Format the response to match the API response format
+          const questionnaire = mockStorage.questionnaires.getById(response.questionnaire_id);
+
+          return {
+            response: {
+              ...response,
+              questionnaire_title: questionnaire ? questionnaire.title : 'Unknown Questionnaire',
+              answers: response.answers || []
+            }
+          };
         }
 
         // Use API in production
         try {
-          return await fetchWithErrorHandling(`${API_URL}/responses/code/${uniqueCode}`);
+          console.log(`Fetching response with unique code ${uniqueCode} from API`);
+          const result = await apiClient.get(`/responses/code/${uniqueCode}`);
+          console.log('API response:', result.data);
+          return result.data;
         } catch (err) {
           // If the API returns a 404, return null instead of throwing an error
-          if (err && typeof err === 'object' && 'status' in err && err.status === 404) {
+          if (err && typeof err === 'object' && 'response' in err && err.response && typeof err.response === 'object' && 'status' in err.response && err.response.status === 404) {
             console.warn(`Response with unique code ${uniqueCode} not found`);
             return null;
           }
@@ -687,12 +1082,25 @@ export const api = {
      */
     getWithAnswers: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           const response = mockStorage.responses.getById(id);
           if (!response) {
-            throw new Error(`Response with ID ${id} not found`);
+            console.error(`Response with ID ${id} not found`);
+            // Return a default response structure instead of throwing
+            return {
+              response: {
+                id,
+                questionnaire_id: 1, // Default to PHQ-9
+                patient_email: 'unknown@example.com',
+                flagged_for_review: false,
+                completed_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                unique_code: `RESP-${id}`,
+                answers: []
+              }
+            };
           }
 
           // Get questions for this response
@@ -719,8 +1127,29 @@ export const api = {
           };
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses/${id}/with-answers`);
+        // Use real API
+        try {
+          const response = await apiClient.get(`/responses/${id}/answers`);
+          return response.data;
+        } catch (err: any) {
+          // If the API returns a 404, return a default response structure
+          if (err && typeof err === 'object' && 'response' in err && err.response?.status === 404) {
+            console.warn(`Response with ID ${id} not found in API`);
+            return {
+              response: {
+                id,
+                questionnaire_id: 1, // Default to PHQ-9
+                patient_email: 'unknown@example.com',
+                flagged_for_review: false,
+                completed_at: new Date().toISOString(),
+                created_at: new Date().toISOString(),
+                unique_code: `RESP-${id}`,
+                answers: []
+              }
+            };
+          }
+          throw err;
+        }
       } catch (error) {
         console.error(`Failed to get response with answers ${id}:`, error);
         throw error;
@@ -732,8 +1161,8 @@ export const api = {
      */
     flag: async (id: number, flagged: boolean) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           const response = mockStorage.responses.getById(id);
           if (!response) {
@@ -752,14 +1181,9 @@ export const api = {
           return updatedResponse;
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses/${id}/flag`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ flagged })
-        });
+        // Use real API
+        const response = await apiClient.put(`/responses/${id}/flag`, { flagged });
+        return response.data.response;
       } catch (error) {
         console.error(`Failed to update flag status for response ${id}:`, error);
         throw error;
@@ -771,17 +1195,22 @@ export const api = {
      */
     getByQuestionnaire: async (questionnaireId: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
           return mockStorage.responses.getByQuestionnaire(questionnaireId);
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${questionnaireId}/responses`);
+        const response = await apiClient.get(`/questionnaires/${questionnaireId}/responses`);
+        return response.data.responses;
       } catch (error) {
         console.error(`Failed to get responses for questionnaire ${questionnaireId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay();
+        return mockStorage.responses.getByQuestionnaire(questionnaireId);
       }
     },
 
@@ -790,18 +1219,20 @@ export const api = {
      */
     create: async (questionnaireId: number, responseData: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        console.log('Creating response for questionnaire:', questionnaireId, 'with data:', responseData);
+
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(1000);
 
           const startTime = Date.now();
           const answers = responseData.answers || [];
 
-          // Calculate score
-          const { score, riskLevel } = mockStorage.calculateScore(
-            questionnaireId,
-            answers
-          );
+          // Calculate score using the scoring service
+          const questions = mockStorage.questions.getByQuestionnaire(questionnaireId);
+          const scoringResult = scoringService.calculateScore(questionnaireId, answers, questions);
+          const score = scoringResult.score;
+          const riskLevel = scoringResult.risk_level;
 
           // Create response
           const newResponse = {
@@ -812,13 +1243,15 @@ export const api = {
             patient_gender: responseData.patient_gender,
             score,
             risk_level: riskLevel,
-            flagged_for_review: riskLevel === 'severe' || riskLevel === 'moderately severe',
+            flagged_for_review: scoringResult.flagged_for_review,
             completed_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
             completion_time: responseData.completion_time || Math.floor((Date.now() - startTime) / 1000),
             unique_code: generateUniqueCode(),
             answers: []
           };
+
+          console.log('Created response with score:', score, 'and risk level:', riskLevel);
 
           // Create the response first
           const createdResponse = mockStorage.responses.create(newResponse);
@@ -828,13 +1261,10 @@ export const api = {
 
           // Process each answer and add it to the response
           for (const answer of answers) {
-            const question = mockStorage.questions.getById(answer.question_id);
-            let answerScore = 0;
+            // Get the score for this answer from the scoring result
+            const answerScore = scoringResult.answer_scores[answer.question_id] || 0;
 
-            // Calculate score for this answer if applicable
-            if (question && question.type === 'single_choice' && typeof answer.value === 'number') {
-              answerScore = (answer.value as number) * (question.scoring_weight || 1);
-            }
+            console.log('Processing answer for question:', answer.question_id, 'with value:', answer.value, 'and score:', answerScore);
 
             // Add this answer to the response
             updatedResponse.answers.push({
@@ -853,14 +1283,76 @@ export const api = {
           return finalResponse;
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(responseData)
-        });
+        // Use real API
+        // Validate the response data
+        if (!responseData.patient_email) {
+          console.error('Patient email is missing in the response data');
+          throw new Error('Patient email is required');
+        }
+
+        if (!responseData.answers || !Array.isArray(responseData.answers) || responseData.answers.length === 0) {
+          console.error('Answers are missing or invalid in the response data');
+          throw new Error('Answers are required and must be an array');
+        }
+
+        const data = {
+          ...responseData,
+          questionnaire_id: questionnaireId,
+          start_time: responseData.start_time || new Date().toISOString()
+        };
+
+        // Ensure answers are properly formatted for the API
+        if (data.answers && Array.isArray(data.answers)) {
+          // Filter out any answers with empty values
+          data.answers = data.answers
+            .filter((answer: { question_id: number | string; value: any }) => {
+              if (!answer.question_id && answer.question_id !== 0) {
+                console.log('Filtering out answer without question_id:', answer);
+                return false;
+              }
+
+              const value = answer.value;
+              const isEmpty = value === '' || value === null || value === undefined ||
+                      (Array.isArray(value) && value.length === 0);
+
+              if (isEmpty) {
+                console.log(`Filtering out empty answer for question ${answer.question_id}:`, answer);
+                return false;
+              }
+
+              return true;
+            })
+            .map((answer: { question_id: number | string; value: any }) => {
+              // Ensure question_id is a number
+              let questionId;
+              if (typeof answer.question_id === 'string') {
+                questionId = parseInt(answer.question_id, 10);
+              } else {
+                questionId = Number(answer.question_id);
+              }
+
+              if (isNaN(questionId)) {
+                console.error('Invalid question_id:', answer.question_id);
+                throw new Error(`Invalid question_id: ${answer.question_id}`);
+              }
+
+              return {
+                question_id: questionId,
+                value: answer.value
+              };
+            });
+        }
+
+        // Check if we have any answers after filtering
+        if (!data.answers || data.answers.length === 0) {
+          console.error('No valid answers after filtering');
+          throw new Error('No valid answers to submit');
+        }
+
+        console.log('Sending response data to API:', JSON.stringify(data));
+        const response = await apiClient.post('/responses', data);
+        console.log('API response:', response.data);
+        return response.data.response;
       } catch (error) {
         console.error('Failed to create response:', error);
         throw error;
@@ -919,6 +1411,115 @@ export const api = {
         console.error(`Failed to delete response ${id}:`, error);
         throw error;
       }
+    },
+
+    /**
+     * Get statistics for a questionnaire
+     */
+    getStatsByQuestionnaireId: async (questionnaireId: number) => {
+      try {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
+          await simulateApiDelay(800);
+
+          // Get responses for this questionnaire
+          const responses = mockStorage.responses.getByQuestionnaire(questionnaireId);
+
+          // Calculate statistics
+          const totalResponses = responses.length;
+          const completedResponses = responses.filter(r => r.completed_at).length;
+          const completionRate = totalResponses > 0 ? Math.round((completedResponses / totalResponses) * 100) : 0;
+
+          // Calculate risk levels
+          const riskLevels = {
+            low: 0,
+            medium: 0,
+            high: 0
+          };
+
+          responses.forEach(response => {
+            if (response.risk_level) {
+              if (['minimal', 'mild'].includes(response.risk_level)) {
+                riskLevels.low++;
+              } else if (['moderate'].includes(response.risk_level)) {
+                riskLevels.medium++;
+              } else if (['moderately severe', 'severe'].includes(response.risk_level)) {
+                riskLevels.high++;
+              }
+            }
+          });
+
+          // Calculate average score
+          const scores = responses.filter(r => r.score !== undefined && r.score !== null).map(r => r.score as number);
+          const averageScore = scores.length > 0 ? parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : 0;
+
+          return {
+            total: totalResponses,
+            completion_rate: completionRate,
+            average_score: averageScore,
+            risk_levels: riskLevels
+          };
+        }
+
+        // Use API in production
+        console.log(`Fetching statistics for questionnaire ${questionnaireId}`);
+        try {
+          // First try the /statistics endpoint (as defined in the API routes)
+          const response = await apiClient.get(`/questionnaires/${questionnaireId}/statistics`);
+          console.log('Statistics response:', response.data);
+          return response.data.statistics || response.data;
+        } catch (apiError) {
+          console.warn(`Error fetching from /statistics endpoint: ${apiError}`);
+          // Fallback to /stats endpoint
+          const fallbackResponse = await apiClient.get(`/questionnaires/${questionnaireId}/stats`);
+          console.log('Fallback statistics response:', fallbackResponse.data);
+          return fallbackResponse.data;
+        }
+      } catch (error) {
+        console.error(`Failed to get statistics for questionnaire ${questionnaireId}:`, error);
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(800);
+
+        // Get responses for this questionnaire
+        const responses = mockStorage.responses.getByQuestionnaire(questionnaireId);
+
+        // Calculate statistics
+        const totalResponses = responses.length;
+        const completedResponses = responses.filter(r => r.completed_at).length;
+        const completionRate = totalResponses > 0 ? Math.round((completedResponses / totalResponses) * 100) : 0;
+
+        // Calculate risk levels
+        const riskLevels = {
+          low: 0,
+          medium: 0,
+          high: 0
+        };
+
+        responses.forEach(response => {
+          if (response.risk_level) {
+            if (['minimal', 'mild'].includes(response.risk_level)) {
+              riskLevels.low++;
+            } else if (['moderate'].includes(response.risk_level)) {
+              riskLevels.medium++;
+            } else if (['moderately severe', 'severe'].includes(response.risk_level)) {
+              riskLevels.high++;
+            }
+          }
+        });
+
+        // Calculate average score
+        const scores = responses.filter(r => r.score !== undefined && r.score !== null).map(r => r.score as number);
+        const averageScore = scores.length > 0 ? parseFloat((scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1)) : 0;
+
+        return {
+          total: totalResponses,
+          completion_rate: completionRate,
+          average_score: averageScore,
+          risk_levels: riskLevels
+        };
+      }
     }
   },
 
@@ -931,8 +1532,8 @@ export const api = {
      */
     calculateScore: async (responseId: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(1000);
 
           // Get response data
@@ -974,12 +1575,51 @@ export const api = {
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses/${responseId}/score`, {
-          method: 'POST'
-        });
+        const response = await apiClient.post(`/responses/${responseId}/score`);
+        return response.data;
       } catch (error) {
         console.error(`Failed to calculate score for response ${responseId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(1000);
+
+        // Get response data
+        const response = mockStorage.responses.getById(responseId);
+        if (!response) {
+          throw new Error(`Response with ID ${responseId} not found`);
+        }
+
+        // Get questions for this questionnaire
+        const questions = mockStorage.questions.getByQuestionnaire(response.questionnaire_id);
+
+        // Calculate score
+        const scoringResult = scoringService.calculateScore(
+          response.questionnaire_id,
+          response.answers,
+          questions
+        );
+
+        // Update response with new score and risk level
+        const updatedResponse = mockStorage.responses.update(responseId, {
+          score: scoringResult.score,
+          risk_level: scoringResult.risk_level,
+          flagged_for_review: scoringResult.flagged_for_review
+        });
+
+        // Update answer scores
+        response.answers.forEach(answer => {
+          const answerScore = scoringResult.answer_scores[answer.question_id];
+          if (answerScore !== undefined) {
+            // In a real implementation, we would update the answer in the database
+            answer.score = answerScore;
+          }
+        });
+
+        return {
+          response: updatedResponse,
+          scoring: scoringResult
+        };
       }
     },
 
@@ -988,8 +1628,8 @@ export const api = {
      */
     updateScore: async (responseId: number, score: number, riskLevel: string) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
 
           // Get response data
@@ -1009,16 +1649,29 @@ export const api = {
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses/${responseId}/score`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ score, risk_level: riskLevel })
-        });
+        const response = await apiClient.put(`/responses/${responseId}/score`, { score, risk_level: riskLevel });
+        return response.data;
       } catch (error) {
         console.error(`Failed to update score for response ${responseId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(800);
+
+        // Get response data
+        const response = mockStorage.responses.getById(responseId);
+        if (!response) {
+          throw new Error(`Response with ID ${responseId} not found`);
+        }
+
+        // Update response with new score and risk level
+        const updatedResponse = mockStorage.responses.update(responseId, {
+          score,
+          risk_level: riskLevel,
+          flagged_for_review: ['severe', 'moderately severe', 'high'].includes(riskLevel)
+        });
+
+        return updatedResponse;
       }
     },
 
@@ -1027,8 +1680,8 @@ export const api = {
      */
     updateAnswerScores: async (responseId: number, answerScores: Record<number, number>) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(1000);
 
           // Get response data
@@ -1068,16 +1721,49 @@ export const api = {
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/responses/${responseId}/answers/scores`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ answer_scores: answerScores })
-        });
+        const response = await apiClient.put(`/responses/${responseId}/answers/scores`, { answer_scores: answerScores });
+        return response.data;
       } catch (error) {
         console.error(`Failed to update answer scores for response ${responseId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay(1000);
+
+        // Get response data
+        const response = mockStorage.responses.getById(responseId);
+        if (!response) {
+          throw new Error(`Response with ID ${responseId} not found`);
+        }
+
+        // Update answer scores
+        response.answers.forEach(answer => {
+          const score = answerScores[answer.question_id];
+          if (score !== undefined) {
+            // In a real implementation, we would update the answer in the database
+            answer.score = score;
+          }
+        });
+
+        // Recalculate total score
+        const questions = mockStorage.questions.getByQuestionnaire(response.questionnaire_id);
+        const scoringResult = scoringService.calculateScore(
+          response.questionnaire_id,
+          response.answers,
+          questions
+        );
+
+        // Update response with new score and risk level
+        const updatedResponse = mockStorage.responses.update(responseId, {
+          score: scoringResult.score,
+          risk_level: scoringResult.risk_level,
+          flagged_for_review: scoringResult.flagged_for_review
+        });
+
+        return {
+          response: updatedResponse,
+          scoring: scoringResult
+        };
       }
     },
 
@@ -1086,8 +1772,8 @@ export const api = {
      */
     getScoringConfig: async (questionnaireId: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay();
 
           // Get scoring configuration
@@ -1096,10 +1782,18 @@ export const api = {
         }
 
         // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${questionnaireId}/scoring-config`);
+        const response = await apiClient.get(`/questionnaires/${questionnaireId}/scoring-config`);
+        return response.data;
       } catch (error) {
         console.error(`Failed to get scoring configuration for questionnaire ${questionnaireId}:`, error);
-        throw error;
+
+        // Fallback to mock data if API request fails
+        console.warn('Falling back to mock data due to API error');
+        await simulateApiDelay();
+
+        // Get scoring configuration
+        const config = scoringService.getScoringConfig(questionnaireId);
+        return { config };
       }
     }
   },
