@@ -9,13 +9,14 @@ const app = express();
 
 // Middleware
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  origin: '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['X-CSRF-Token', 'X-Requested-With', 'Accept', 'Accept-Version', 'Content-Length', 'Content-MD5', 'Content-Type', 'Date', 'X-Api-Version', 'Authorization'],
+  credentials: true
 }));
 
 // Log CORS configuration
-console.log('CORS configured with origin:', process.env.CORS_ORIGIN || '*');
+console.log('CORS configured with origin: *');
 app.use(morgan('dev'));
 app.use(compression());
 app.use(express.json());
