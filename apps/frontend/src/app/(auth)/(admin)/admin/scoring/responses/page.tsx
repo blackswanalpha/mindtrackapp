@@ -82,7 +82,13 @@ const ResponseScoringPage = () => {
 
         // Fetch questionnaires for filter
         const questionnairesData = await api.questionnaires.getAll();
-        setQuestionnaires(questionnairesData.map((q: any) => ({ id: q.id, title: q.title })));
+
+        // Ensure questionnairesData is an array
+        const questionnairesArray = Array.isArray(questionnairesData)
+          ? questionnairesData
+          : questionnairesData?.questionnaires || [];
+
+        setQuestionnaires(questionnairesArray.map((q: any) => ({ id: q.id, title: q.title })));
       } catch (error: any) {
         console.error('Error fetching data:', error);
         setError(error.message || 'Failed to load responses');

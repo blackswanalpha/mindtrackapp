@@ -74,112 +74,39 @@ const QuestionnaireDetailPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState('overview');
   const [isDeleting, setIsDeleting] = useState(false);
-  const [stats, setStats] = useState<any>({
-    total_responses: 0,
-    completion_rate: 0,
-    avg_score: 0,
-    risk_levels: {
-      low: 0,
-      medium: 0,
-      high: 0
-    }
-  });
+  const [stats, setStats] = useState<any>(null);
 
-  // Fetch questionnaire data
+  // Fetch questionnaire and organization from API
   useEffect(() => {
-    const fetchQuestionnaireAndOrganization = async () => {
+    const fetchData = async () => {
       setIsLoading(true);
       setError(null);
-
       try {
-        // In a real implementation, this would call the API
-        // const questionnaireData = await api.questionnaires.getById(Number(questionnaireId));
-        // const organizationData = await api.organizations.getById(Number(id));
-
-        // Mock data for demonstration
-        const mockOrganization = {
-          id: Number(id),
-          name: id === '1' ? 'Mental Health Clinic' :
-                id === '2' ? 'Wellness Center' :
-                id === '3' ? 'Community Health Services' : 'Research Institute',
-        };
-
-        // Find the questionnaire from the mock data
-        const mockQuestionnaires = [
-          {
-            id: 1,
-            organization_id: Number(id),
-            title: 'Depression Assessment (PHQ-9)',
-            description: 'A standardized questionnaire for screening and measuring the severity of depression.',
-            instructions: 'Please answer each question based on how you have been feeling over the last 2 weeks.',
-            type: 'assessment',
-            category: 'Mental Health',
-            is_active: true,
-            is_public: true,
-            response_count: 128,
-            created_at: '2023-01-15T10:30:00Z',
-            updated_at: '2023-06-20T14:45:00Z',
-            created_by: {
-              id: 101,
-              name: 'John Doe'
-            },
-            estimated_time: 5
-          },
-          {
-            id: 2,
-            organization_id: Number(id),
-            title: 'Anxiety Screening (GAD-7)',
-            description: 'A tool used to screen for generalized anxiety disorder.',
-            instructions: 'Over the last 2 weeks, how often have you been bothered by the following problems?',
-            type: 'assessment',
-            category: 'Mental Health',
-            is_active: true,
-            is_public: true,
-            response_count: 96,
-            created_at: '2023-02-10T09:15:00Z',
-            updated_at: '2023-05-18T11:30:00Z',
-            created_by: {
-              id: 102,
-              name: 'Jane Smith'
-            },
-            estimated_time: 4
-          }
-        ];
-
-        const questionnaireData = mockQuestionnaires.find(q => q.id === Number(questionnaireId)) || null;
-
-        if (!questionnaireData) {
-          throw new Error('Questionnaire not found');
-        }
-
-        // Mock statistics
-        const mockStats = {
-          total_responses: questionnaireData.response_count,
-          completion_rate: Math.floor(Math.random() * 30) + 70,
-          avg_score: Math.floor(Math.random() * 15) + 5,
-          risk_levels: {
-            low: Math.floor(questionnaireData.response_count * 0.6),
-            medium: Math.floor(questionnaireData.response_count * 0.3),
-            high: Math.floor(questionnaireData.response_count * 0.1)
-          }
-        };
-
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 800));
-
+        const [questionnaireData, organizationData] = await Promise.all([
+          api.questionnaires.getById(Number(questionnaireId)),
+          api.organizations.getById(Number(id)),
+        ]);
         setQuestionnaire(questionnaireData);
-        setOrganization(mockOrganization);
-        setStats(mockStats);
+        setOrganization(organizationData);
+        // Optionally fetch stats if you have an endpoint, else use response_count
+        if (api.questionnaires.getStatistics) {
+          try {
+            const statsData = await api.questionnaires.getStatistics(Number(questionnaireId));
+            setStats(statsData);
+          } catch {
+            setStats(null);
+          }
+        } else {
+          setStats(null);
+        }
       } catch (err) {
         setError('Failed to load questionnaire details');
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
     };
-
     if (id && questionnaireId) {
-      fetchQuestionnaireAndOrganization();
+      fetchData();
     }
   }, [id, questionnaireId]);
 
@@ -313,7 +240,7 @@ const QuestionnaireDetailPage = () => {
           onClick={() => router.push(`/admin/organizations/${id}/questionnaires/${questionnaireId}/responses`)}
         >
           <MessageSquare className="h-4 w-4 mr-2" />
-          Responses ({stats.total_responses})
+          Responses ({stats?.total_responses || questionnaire.response_count})
         </Button>
 
         <Button
@@ -429,7 +356,7 @@ const QuestionnaireDetailPage = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium text-gray-500">Total Responses</h3>
-                      <span className="text-2xl font-bold text-gray-800">{stats.total_responses}</span>
+                      <span className="text-2xl font-bold text-gray-800">{stats?.total_responses || questionnaire.response_count}</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div className="h-full bg-blue-500 rounded-full" style={{ width: '100%' }}></div>
@@ -439,12 +366,12 @@ const QuestionnaireDetailPage = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium text-gray-500">Completion Rate</h3>
-                      <span className="text-2xl font-bold text-gray-800">{stats.completion_rate}%</span>
+                      <span className="text-2xl font-bold text-gray-800">{stats?.completion_rate || 0}%</span>
                     </div>
                     <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                       <div
                         className="h-full bg-green-500 rounded-full"
-                        style={{ width: `${stats.completion_rate}%` }}
+                        style={{ width: `${stats?.completion_rate || 0}%` }}
                       ></div>
                     </div>
                   </div>
@@ -452,7 +379,7 @@ const QuestionnaireDetailPage = () => {
                   <div>
                     <div className="flex justify-between items-center mb-2">
                       <h3 className="text-sm font-medium text-gray-500">Average Score</h3>
-                      <span className="text-2xl font-bold text-gray-800">{stats.avg_score}</span>
+                      <span className="text-2xl font-bold text-gray-800">{stats?.avg_score || 0}</span>
                     </div>
                   </div>
 
@@ -462,12 +389,12 @@ const QuestionnaireDetailPage = () => {
                       <div>
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-sm text-gray-600">Low Risk</span>
-                          <span className="text-sm font-medium text-gray-800">{stats.risk_levels.low}</span>
+                          <span className="text-sm font-medium text-gray-800">{stats?.risk_levels?.low || 0}</span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-green-500 rounded-full"
-                            style={{ width: `${(stats.risk_levels.low / stats.total_responses) * 100}%` }}
+                            style={{ width: `${(stats?.risk_levels?.low / stats?.total_responses) * 100 || 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -475,12 +402,12 @@ const QuestionnaireDetailPage = () => {
                       <div>
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-sm text-gray-600">Medium Risk</span>
-                          <span className="text-sm font-medium text-gray-800">{stats.risk_levels.medium}</span>
+                          <span className="text-sm font-medium text-gray-800">{stats?.risk_levels?.medium || 0}</span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-yellow-500 rounded-full"
-                            style={{ width: `${(stats.risk_levels.medium / stats.total_responses) * 100}%` }}
+                            style={{ width: `${(stats?.risk_levels?.medium / stats?.total_responses) * 100 || 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -488,12 +415,12 @@ const QuestionnaireDetailPage = () => {
                       <div>
                         <div className="flex justify-between items-center mb-1">
                           <span className="text-sm text-gray-600">High Risk</span>
-                          <span className="text-sm font-medium text-gray-800">{stats.risk_levels.high}</span>
+                          <span className="text-sm font-medium text-gray-800">{stats?.risk_levels?.high || 0}</span>
                         </div>
                         <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
                           <div
                             className="h-full bg-red-500 rounded-full"
-                            style={{ width: `${(stats.risk_levels.high / stats.total_responses) * 100}%` }}
+                            style={{ width: `${(stats?.risk_levels?.high / stats?.total_responses) * 100 || 0}%` }}
                           ></div>
                         </div>
                       </div>
@@ -507,7 +434,7 @@ const QuestionnaireDetailPage = () => {
                     onClick={() => router.push(`/admin/organizations/${id}/questionnaires/${questionnaireId}/responses`)}
                   >
                     <MessageSquare className="h-4 w-4 mr-2" />
-                    View All Responses ({stats.total_responses})
+                    View All Responses ({stats?.total_responses || questionnaire.response_count})
                   </Button>
                 </div>
               </Card>
@@ -553,7 +480,7 @@ const QuestionnaireDetailPage = () => {
                     <MessageSquare className="h-5 w-5 text-blue-600" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{stats.total_responses}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats?.total_responses || questionnaire.response_count}</p>
                 <p className="text-sm text-gray-500 mt-2">
                   {questionnaire.response_count > 0
                     ? `Last response ${Math.floor(Math.random() * 24) + 1} hours ago`
@@ -568,11 +495,11 @@ const QuestionnaireDetailPage = () => {
                     <CheckCircle className="h-5 w-5 text-green-600" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{stats.completion_rate}%</p>
+                <p className="text-3xl font-bold text-gray-900">{stats?.completion_rate || 0}%</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  {stats.completion_rate > 80
+                  {stats?.completion_rate > 80
                     ? 'Excellent completion rate'
-                    : stats.completion_rate > 60
+                    : stats?.completion_rate > 60
                     ? 'Good completion rate'
                     : 'Could be improved'}
                 </p>
@@ -585,11 +512,11 @@ const QuestionnaireDetailPage = () => {
                     <BarChart3 className="h-5 w-5 text-purple-600" />
                   </div>
                 </div>
-                <p className="text-3xl font-bold text-gray-900">{stats.avg_score}</p>
+                <p className="text-3xl font-bold text-gray-900">{stats?.avg_score || 0}</p>
                 <p className="text-sm text-gray-500 mt-2">
-                  {stats.avg_score > 15
+                  {stats?.avg_score > 15
                     ? 'Higher than average'
-                    : stats.avg_score > 10
+                    : stats?.avg_score > 10
                     ? 'Average score'
                     : 'Lower than average'}
                 </p>
@@ -601,32 +528,32 @@ const QuestionnaireDetailPage = () => {
               <div className="h-8 bg-gray-200 rounded-full overflow-hidden flex">
                 <div
                   className="h-full bg-green-500"
-                  style={{ width: `${(stats.risk_levels.low / stats.total_responses) * 100}%` }}
-                  title={`Low Risk: ${stats.risk_levels.low} (${Math.round((stats.risk_levels.low / stats.total_responses) * 100)}%)`}
+                  style={{ width: `${(stats?.risk_levels?.low / stats?.total_responses) * 100 || 0}%` }}
+                  title={`Low Risk: ${stats?.risk_levels?.low || 0} (${Math.round((stats?.risk_levels?.low / stats?.total_responses) * 100) || 0}%)`}
                 ></div>
                 <div
                   className="h-full bg-yellow-500"
-                  style={{ width: `${(stats.risk_levels.medium / stats.total_responses) * 100}%` }}
-                  title={`Medium Risk: ${stats.risk_levels.medium} (${Math.round((stats.risk_levels.medium / stats.total_responses) * 100)}%)`}
+                  style={{ width: `${(stats?.risk_levels?.medium / stats?.total_responses) * 100 || 0}%` }}
+                  title={`Medium Risk: ${stats?.risk_levels?.medium || 0} (${Math.round((stats?.risk_levels?.medium / stats?.total_responses) * 100) || 0}%)`}
                 ></div>
                 <div
                   className="h-full bg-red-500"
-                  style={{ width: `${(stats.risk_levels.high / stats.total_responses) * 100}%` }}
-                  title={`High Risk: ${stats.risk_levels.high} (${Math.round((stats.risk_levels.high / stats.total_responses) * 100)}%)`}
+                  style={{ width: `${(stats?.risk_levels?.high / stats?.total_responses) * 100 || 0}%` }}
+                  title={`High Risk: ${stats?.risk_levels?.high || 0} (${Math.round((stats?.risk_levels?.high / stats?.total_responses) * 100) || 0}%)`}
                 ></div>
               </div>
               <div className="flex justify-between mt-2 text-sm text-gray-600">
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-green-500 rounded-full mr-1"></div>
-                  <span>Low: {stats.risk_levels.low} ({Math.round((stats.risk_levels.low / stats.total_responses) * 100)}%)</span>
+                  <span>Low: {stats?.risk_levels?.low || 0} ({Math.round((stats?.risk_levels?.low / stats?.total_responses) * 100) || 0}%)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-yellow-500 rounded-full mr-1"></div>
-                  <span>Medium: {stats.risk_levels.medium} ({Math.round((stats.risk_levels.medium / stats.total_responses) * 100)}%)</span>
+                  <span>Medium: {stats?.risk_levels?.medium || 0} ({Math.round((stats?.risk_levels?.medium / stats?.total_responses) * 100) || 0}%)</span>
                 </div>
                 <div className="flex items-center">
                   <div className="w-3 h-3 bg-red-500 rounded-full mr-1"></div>
-                  <span>High: {stats.risk_levels.high} ({Math.round((stats.risk_levels.high / stats.total_responses) * 100)}%)</span>
+                  <span>High: {stats?.risk_levels?.high || 0} ({Math.round((stats?.risk_levels?.high / stats?.total_responses) * 100) || 0}%)</span>
                 </div>
               </div>
             </div>

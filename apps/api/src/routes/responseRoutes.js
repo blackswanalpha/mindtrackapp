@@ -17,6 +17,20 @@ router.get(
 );
 
 /**
+ * @route GET /api/responses/code/:uniqueCode
+ * @desc Get response by unique code
+ * @access Public
+ */
+router.get(
+  '/code/:uniqueCode',
+  [
+    param('uniqueCode').isString().withMessage('Invalid response code')
+  ],
+  validate,
+  responseController.getResponseByUniqueCode
+);
+
+/**
  * @route GET /api/responses/:id
  * @desc Get response by ID
  * @access Private

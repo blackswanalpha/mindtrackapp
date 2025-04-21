@@ -12,12 +12,14 @@ This guide provides instructions for deploying the MindTrack application to Verc
 
 Before deploying, you need to set up the following environment variables in Vercel:
 
-1. `DATABASE_URL`: Your PostgreSQL connection string
+1. `DATABASE_URL`: Your Neon PostgreSQL connection string
 2. `JWT_SECRET`: A secret key for JWT token generation
-3. `EMAIL_SERVICE`: Email service provider (e.g., "gmail")
-4. `EMAIL_USER`: Email username/address
-5. `EMAIL_PASSWORD`: Email password or app-specific password
-6. `FRONTEND_URL`: URL of the frontend application
+3. `EMAIL_HOST`: Email service provider host (e.g., "smtp.gmail.com")
+4. `EMAIL_PORT`: Email service port (e.g., "587")
+5. `EMAIL_USER`: Email username/address
+6. `EMAIL_PASS`: Email password or app-specific password
+7. `EMAIL_FROM`: From address for sent emails (e.g., "MindTrack <noreply@mindtrack.com>")
+8. `NEXT_PUBLIC_API_URL`: URL of the API (e.g., "https://mindtrack.vercel.app/api/v1")
 
 ## Deployment Steps
 
@@ -60,23 +62,23 @@ Before deploying, you need to set up the following environment variables in Verc
 
 After deployment, you need to set up the database:
 
-1. **Run the database setup script**
+1. **Run the database migration script**
 
    ```bash
    # Using Vercel CLI
    vercel env pull .env.production
    source .env.production
    cd apps/api
-   npm run setup-neon-db
+   node src/db/migrations/add_missing_columns.js
    ```
 
-   Alternatively, you can run the setup script from the Vercel dashboard:
+   Alternatively, you can run the migration by visiting the migration endpoint:
 
-   - Go to your project in the Vercel dashboard
-   - Click on "Functions"
-   - Find the API function
-   - Click on "Logs"
-   - Run the setup command in the console
+   ```
+   https://your-app-name.vercel.app/api/v1/db/migrate
+   ```
+
+   This will create all the necessary tables and columns in your Neon database.
 
 ## Verifying Deployment
 

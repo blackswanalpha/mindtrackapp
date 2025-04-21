@@ -51,7 +51,7 @@ const CreateQuestionPage = () => {
       <div className="container mx-auto px-4 py-8">
         <Alert type="error" message={error || 'Failed to load questionnaire'} />
         <div className="mt-4">
-          <Link href={`/questionnaires/${id}`} className="text-blue-600 hover:text-blue-800">
+          <Link href={`/admin/questionnaires/${id}`} className="text-blue-600 hover:text-blue-800">
             Back to Questionnaire
           </Link>
         </div>
@@ -62,7 +62,7 @@ const CreateQuestionPage = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center mb-6">
-        <Link href={`/questionnaires/${id}`} className="text-blue-600 hover:text-blue-800 mr-4">
+        <Link href={`/admin/questionnaires/${id}/questions`} className="text-blue-600 hover:text-blue-800 mr-4">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>

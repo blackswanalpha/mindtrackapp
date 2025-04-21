@@ -132,7 +132,13 @@ const ModernQuestionnaireList: React.FC = () => {
         }
 
         const response = await api.questionnaires.getAll(params);
-        setQuestionnaires(response);
+
+        // Ensure response is an array
+        const questionnaireData = Array.isArray(response)
+          ? response
+          : (response.questionnaires || []);
+
+        setQuestionnaires(questionnaireData);
 
         // Extract all unique tags
         const allTags = response.reduce((tags: string[], q: Questionnaire) => {
@@ -267,7 +273,13 @@ const ModernQuestionnaireList: React.FC = () => {
           const duplicated = await api.questionnaires.duplicate(id);
           // Refresh the list
           const response = await api.questionnaires.getAll();
-          setQuestionnaires(response);
+
+          // Ensure response is an array
+          const questionnaireData = Array.isArray(response)
+            ? response
+            : (response.questionnaires || []);
+
+          setQuestionnaires(questionnaireData);
           alert(`Questionnaire duplicated successfully with ID: ${duplicated.id}`);
         } else {
           // Fallback if the method doesn't exist

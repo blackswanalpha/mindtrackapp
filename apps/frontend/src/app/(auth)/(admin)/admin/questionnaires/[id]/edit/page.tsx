@@ -35,12 +35,14 @@ const EditQuestionnairePage = () => {
 
       try {
         if (typeof window !== 'undefined') {
+          console.log('Fetching questionnaire for editing, ID:', id);
           const response = await api.questionnaires.getById(Number(id));
+          console.log('Fetched questionnaire for editing:', response);
           setQuestionnaire(response);
         }
       } catch (err) {
+        console.error('Error loading questionnaire for editing:', err);
         setError('Failed to load questionnaire');
-        console.error(err);
       } finally {
         setIsLoading(false);
       }

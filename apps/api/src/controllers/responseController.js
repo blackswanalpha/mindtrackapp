@@ -3,6 +3,9 @@ const Answer = require('../models/Answer');
 const Questionnaire = require('../models/Questionnaire');
 const Question = require('../models/Question');
 const ScoringConfig = require('../models/ScoringConfig');
+const User = require('../models/User');
+const emailService = require('../services/emailService');
+const { generateUniqueCode } = require('../utils/codeGenerator');
 
 /**
  * Get all responses
@@ -77,6 +80,38 @@ const getResponseById = async (req, res, next) => {
 };
 
 /**
+ * Get response by unique code
+ * @route GET /api/responses/code/:uniqueCode
+ */
+const getResponseByUniqueCode = async (req, res, next) => {
+  try {
+    const { uniqueCode } = req.params;
+
+    const response = await Response.findByUniqueCode(uniqueCode);
+
+    if (!response) {
+      return res.status(404).json({ message: `Response with code ${uniqueCode} not found. Please check the URL and try again.` });
+    }
+
+    // Get the questionnaire for this response
+    const questionnaire = await Questionnaire.findById(response.questionnaire_id);
+
+    // Get the answers for this response
+    const answers = await Answer.findByResponse(response.id);
+
+    res.json({
+      response: {
+        ...response,
+        questionnaire_title: questionnaire ? questionnaire.title : 'Unknown Questionnaire',
+        answers
+      }
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+/**
  * Create response
  * @route POST /api/responses
  */
@@ -129,6 +164,52 @@ const createResponse = async (req, res, next) => {
       return res.status(400).json({ message: 'Questionnaire has expired' });
     }
 
+    // Validate answers
+    if (!answers || !Array.isArray(answers) || answers.length === 0) {
+      console.error('Invalid answers format:', answers);
+      return res.status(400).json({ message: 'Answers are required and must be an array' });
+    }
+
+    // Log answers for debugging
+    console.log('Received answers:', JSON.stringify(answers));
+    console.log('Questionnaire ID:', questionnaire_id);
+
+    // Get questions to validate answers
+    const questions = await Question.findByQuestionnaire(questionnaire_id);
+    const questionMap = {};
+    questions.forEach(q => { questionMap[q.id] = q; });
+
+    // Validate required questions
+    const requiredQuestions = questions.filter(q => q.required).map(q => q.id);
+    const answeredQuestions = answers.map(a => parseInt(a.question_id));
+    const missingRequiredQuestions = requiredQuestions.filter(id => !answeredQuestions.includes(id));
+
+    if (missingRequiredQuestions.length > 0) {
+      console.error('Missing required questions:', missingRequiredQuestions);
+      console.log('Required questions:', requiredQuestions);
+      console.log('Answered questions:', answeredQuestions);
+
+      // Get the question texts for better error messages
+      const missingQuestionTexts = missingRequiredQuestions.map(id => {
+        const question = questions.find(q => q.id === id);
+        return question ? question.text : `Question ID ${id}`;
+      });
+
+      return res.status(400).json({
+        message: 'Missing answers for required questions',
+        missing_questions: missingRequiredQuestions,
+        missing_question_texts: missingQuestionTexts
+      });
+    }
+
+    // Generate unique code
+    const uniqueCode = generateUniqueCode();
+
+    // Calculate completion time if available
+    const startTime = req.body.start_time ? new Date(req.body.start_time) : null;
+    const endTime = new Date();
+    const completionTime = startTime ? Math.round((endTime - startTime) / 1000) : null;
+
     // Create response
     const response = await Response.create({
       questionnaire_id,
@@ -139,29 +220,108 @@ const createResponse = async (req, res, next) => {
       patient_age,
       patient_gender,
       organization_id,
-      completed_at: new Date()
+      unique_code: uniqueCode,
+      completion_time: completionTime,
+      completed_at: endTime
     });
 
-    // Create answers if provided
-    if (answers && Array.isArray(answers) && answers.length > 0) {
-      await Answer.createBulk(response.id, answers);
+    // Process answers and calculate scores
+    const processedAnswers = [];
+    let totalScore = 0;
+
+    for (const answer of answers) {
+      const question = questionMap[answer.question_id];
+      let score = 0;
+
+      // Calculate score if question has scoring options
+      if (question && question.options) {
+        try {
+          // Handle both string and object options
+          const options = typeof question.options === 'string' ?
+            JSON.parse(question.options) : question.options;
+
+          const selectedOption = options.find(opt => opt.value === answer.value);
+          if (selectedOption && selectedOption.score !== undefined) {
+            score = selectedOption.score * (question.scoring_weight || 1);
+            totalScore += score;
+          }
+        } catch (parseError) {
+          console.error('Error parsing question options:', parseError);
+        }
+      }
+
+      processedAnswers.push({
+        ...answer,
+        score
+      });
     }
 
-    // Calculate score if scoring config exists
-    try {
-      const scoringConfig = await ScoringConfig.findByQuestionnaire(questionnaire_id);
+    // Create answers
+    await Answer.createBulk(response.id, processedAnswers);
 
-      if (scoringConfig) {
-        await ScoringConfig.calculateScore(response.id);
+    // Update response with score
+    await Response.update(response.id, { score: totalScore });
+    response.score = totalScore;
+
+    // Determine risk level based on score
+    // This is a simple example - in a real app, you'd use more sophisticated logic
+    let riskLevel = 'low';
+    if (totalScore > 15) riskLevel = 'high';
+    else if (totalScore > 7) riskLevel = 'medium';
+
+    await Response.update(response.id, { risk_level: riskLevel });
+    response.risk_level = riskLevel;
+
+    // Send email notification if email is provided
+    if (patient_email) {
+      try {
+        await emailService.sendResponseCompletionEmail({
+          email: patient_email,
+          uniqueCode,
+          response,
+          questionnaire
+        });
+        console.log(`Response completion email sent to ${patient_email}`);
+      } catch (emailError) {
+        console.error('Error sending response completion email:', emailError);
+        // Don't fail the request if email sending fails
       }
-    } catch (scoringError) {
-      console.error('Error calculating score:', scoringError);
-      // Continue without scoring
+    }
+
+    // Send notification to healthcare providers if high risk
+    if (riskLevel === 'high' && organization_id) {
+      try {
+        // Get organization admins
+        const admins = await User.findByOrganizationAndRole(organization_id, 'healthcare_provider');
+
+        for (const admin of admins) {
+          if (admin.email) {
+            await emailService.sendFlaggedResponseEmail({
+              email: admin.email,
+              response,
+              questionnaire,
+              patient: {
+                name: patient_name,
+                email: patient_email,
+                identifier: patient_identifier
+              }
+            });
+          }
+        }
+
+        console.log(`High risk notification sent to healthcare providers for response ${response.id}`);
+      } catch (notificationError) {
+        console.error('Error sending high risk notification:', notificationError);
+        // Don't fail the request if notification sending fails
+      }
     }
 
     res.status(201).json({
       message: 'Response submitted successfully',
-      response
+      response,
+      unique_code: uniqueCode,
+      score: totalScore,
+      risk_level: riskLevel
     });
   } catch (error) {
     next(error);
@@ -381,6 +541,7 @@ const exportResponses = async (req, res, next) => {
 module.exports = {
   getResponses,
   getResponseById,
+  getResponseByUniqueCode,
   createResponse,
   updateResponse,
   deleteResponse,

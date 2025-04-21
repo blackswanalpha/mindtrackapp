@@ -80,6 +80,17 @@ class Response extends BaseModel {
   }
 
   /**
+   * Find response by unique code
+   * @param {String} uniqueCode - Unique code
+   * @returns {Promise<Object|null>} - Response or null
+   */
+  async findByUniqueCode(uniqueCode) {
+    return this.findOne({
+      where: { unique_code: uniqueCode }
+    });
+  }
+
+  /**
    * Find responses with answers and questions
    * @param {Number} responseId - Response ID
    * @returns {Promise<Object|null>} - Response with answers and questions

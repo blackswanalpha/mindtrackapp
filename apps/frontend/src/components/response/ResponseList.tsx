@@ -3,8 +3,37 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Mail,
+  Download,
+  Eye,
+  Flag,
+  Brain,
+  BarChart3,
+  Search,
+  Filter,
+  RefreshCw,
+  ChevronDown,
+  ChevronUp,
+  User,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  CheckCircle,
+  FileText
+} from 'lucide-react';
+import {
+  Card,
+  Button,
+  Loading,
+  Alert,
+  Badge,
+  Select,
+  ProgressBar
+} from '@/components/common';
+import AIAnalysisModal from '@/components/ai/AIAnalysisModal';
 import api from '@/services/api';
-import { Mail, Download, Eye, Flag } from 'lucide-react';
 
 type Response = {
   id: number;
@@ -28,6 +57,7 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState('all'); // all, flagged, high_risk, medium_risk, low_risk
   const [selectedResponses, setSelectedResponses] = useState<number[]>([])
+  const [analysisModal, setAnalysisModal] = useState<{ isOpen: boolean; responseId: number | null }>({ isOpen: false, responseId: null });
 
   useEffect(() => {
     const fetchResponses = async () => {
@@ -118,6 +148,16 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
     router.push(`/email/send?responses=${selectedResponses.join(',')}`);
   };
 
+  // Open AI Analysis modal
+  const handleOpenAnalysis = (responseId: number) => {
+    setAnalysisModal({ isOpen: true, responseId });
+  };
+
+  // Close AI Analysis modal
+  const handleCloseAnalysis = () => {
+    setAnalysisModal({ isOpen: false, responseId: null });
+  };
+
   // Export selected responses
   const handleExport = async () => {
     if (selectedResponses.length === 0) {
@@ -147,256 +187,348 @@ const ResponseList: React.FC<ResponseListProps> = ({ questionnaireId }) => {
     }
   };
 
+  // Render loading state
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      <div className="flex justify-center items-center py-12">
+        <Loading size="large" message="Loading responses..." />
       </div>
     );
   }
 
+  // Render error state
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
-        <strong className="font-bold">Error: </strong>
-        <span className="block sm:inline">{error}</span>
-      </div>
+      <Alert type="error" message={error} />
     );
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
         <div>
-          <h2 className="text-2xl font-bold">Responses</h2>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2 flex items-center">
+            <FileText className="h-7 w-7 mr-3 text-indigo-600" />
+            Responses
+          </h2>
           <p className="text-gray-600">
             {questionnaireId
               ? 'Responses for this questionnaire'
               : 'All questionnaire responses'}
           </p>
         </div>
-        <div className="flex space-x-3">
-          <button
+        <div className="flex flex-wrap gap-3">
+          <Button
+            variant="primary"
             onClick={handleSendEmail}
             disabled={selectedResponses.length === 0}
-            className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center"
           >
             <Mail className="h-4 w-4 mr-2" />
             Send Email
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="light"
             onClick={handleExport}
             disabled={selectedResponses.length === 0}
-            className="flex items-center px-4 py-2 bg-gray-200 text-gray-700 rounded-md hover:bg-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex items-center"
           >
             <Download className="h-4 w-4 mr-2" />
             Export
-          </button>
+          </Button>
+          <Button
+            variant="light"
+            onClick={() => setResponses([...responses])}
+            className="flex items-center"
+          >
+            <RefreshCw className="h-4 w-4 mr-2" />
+            Refresh
+          </Button>
         </div>
       </div>
 
-      <div className="mb-6">
-        <div className="flex space-x-2">
-          <button
-            onClick={() => setFilter('all')}
-            className={`px-4 py-2 rounded-md ${
-              filter === 'all'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('flagged')}
-            className={`px-4 py-2 rounded-md ${
-              filter === 'flagged'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Flagged
-          </button>
-          <button
-            onClick={() => setFilter('high_risk')}
-            className={`px-4 py-2 rounded-md ${
-              filter === 'high_risk'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            High Risk
-          </button>
-          <button
-            onClick={() => setFilter('medium_risk')}
-            className={`px-4 py-2 rounded-md ${
-              filter === 'medium_risk'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Medium Risk
-          </button>
-          <button
-            onClick={() => setFilter('low_risk')}
-            className={`px-4 py-2 rounded-md ${
-              filter === 'low_risk'
-                ? 'bg-blue-600 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-            }`}
-          >
-            Low Risk
-          </button>
+      {/* Filters */}
+      <Card className="p-4 border border-gray-200">
+        <div className="flex flex-col md:flex-row gap-4">
+          <div className="flex-grow">
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <Search className="h-5 w-5 text-gray-400" />
+              </div>
+              <input
+                type="text"
+                placeholder="Search by email, name, or code..."
+                className="pl-10 w-full border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              />
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <Button
+              variant={filter === 'all' ? 'primary' : 'light'}
+              onClick={() => setFilter('all')}
+              className="flex items-center"
+            >
+              All
+            </Button>
+
+            <Button
+              variant={filter === 'flagged' ? 'primary' : 'light'}
+              onClick={() => setFilter('flagged')}
+              className="flex items-center"
+            >
+              <Flag className="h-4 w-4 mr-1" />
+              Flagged
+            </Button>
+
+            <Button
+              variant={filter === 'high_risk' ? 'primary' : 'light'}
+              onClick={() => setFilter('high_risk')}
+              className="flex items-center"
+            >
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              High Risk
+            </Button>
+
+            <Button
+              variant={filter === 'medium_risk' ? 'primary' : 'light'}
+              onClick={() => setFilter('medium_risk')}
+              className="flex items-center"
+            >
+              <AlertTriangle className="h-4 w-4 mr-1" />
+              Medium Risk
+            </Button>
+
+            <Button
+              variant={filter === 'low_risk' ? 'primary' : 'light'}
+              onClick={() => setFilter('low_risk')}
+              className="flex items-center"
+            >
+              <CheckCircle className="h-4 w-4 mr-1" />
+              Low Risk
+            </Button>
+          </div>
         </div>
-      </div>
+      </Card>
 
       {responses.length === 0 ? (
-        <div className="bg-gray-100 p-6 rounded-lg text-center">
-          <p className="text-gray-600">No responses found.</p>
+        <div className="text-center py-12">
+          <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <FileText className="h-8 w-8 text-gray-400" />
+          </div>
+          <h3 className="text-lg font-medium text-gray-700 mb-2">No Responses Found</h3>
+          <p className="text-gray-500 mb-6 max-w-md mx-auto">
+            This questionnaire has not received any responses yet.
+          </p>
         </div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
-              <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  <div className="flex items-center">
-                    <input
-                      type="checkbox"
-                      checked={selectedResponses.length === responses.length}
-                      onChange={handleSelectAll}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                  </div>
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Respondent
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Score
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Risk Level
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Status
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Completed
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {responses.map((response) => (
-                <tr key={response.id} className={`hover:bg-gray-50 ${response.flagged_for_review ? 'bg-yellow-50' : ''}`}>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <input
-                      type="checkbox"
-                      checked={selectedResponses.includes(response.id)}
-                      onChange={() => handleSelectResponse(response.id)}
-                      className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                    />
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {response.patient_name || 'Anonymous'}
+        <Card className="overflow-hidden border border-gray-200">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-gray-200">
+              <thead className="bg-gray-50">
+                <tr>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <div className="flex items-center">
+                      <input
+                        type="checkbox"
+                        checked={selectedResponses.length === responses.length}
+                        onChange={handleSelectAll}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
                     </div>
-                    {response.patient_email && (
-                      <div className="text-sm text-gray-500">{response.patient_email}</div>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-900">
-                      {response.score !== null ? response.score : 'N/A'}
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <div className="flex items-center">
+                      Respondent
+                      <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
                     </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        response.risk_level === 'high'
-                          ? 'bg-red-100 text-red-800'
-                          : response.risk_level === 'medium'
-                          ? 'bg-yellow-100 text-yellow-800'
-                          : 'bg-green-100 text-green-800'
-                      }`}
-                    >
-                      {response.risk_level ? response.risk_level.toUpperCase() : 'N/A'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {response.flagged_for_review && (
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                        Flagged
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                    {response.completed_at
-                      ? new Date(response.completed_at).toLocaleDateString()
-                      : 'Incomplete'}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <div className="flex justify-end space-x-2">
-                      <Link
-                        href={`/responses/${response.id}`}
-                        className="flex items-center p-1 text-blue-600 hover:text-blue-900"
-                        title="View Response"
-                      >
-                        <Eye className="h-4 w-4" />
-                      </Link>
-                      <Link
-                        href={`/email/send?responses=${response.id}`}
-                        className="flex items-center p-1 text-indigo-600 hover:text-indigo-900"
-                        title="Send Email"
-                      >
-                        <Mail className="h-4 w-4" />
-                      </Link>
-                      <button
-                        onClick={() =>
-                          handleFlag(response.id, !response.flagged_for_review)
-                        }
-                        className={`flex items-center p-1 ${
-                          response.flagged_for_review
-                            ? 'text-gray-600 hover:text-gray-900'
-                            : 'text-red-600 hover:text-red-900'
-                        }`}
-                        title={response.flagged_for_review ? 'Unflag' : 'Flag'}
-                      >
-                        <Flag className="h-4 w-4" />
-                      </button>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <div className="flex items-center">
+                      Score
+                      <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
                     </div>
-                  </td>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <div className="flex items-center">
+                      Risk Level
+                      <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
+                    </div>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Status
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    <div className="flex items-center">
+                      Completed
+                      <ChevronDown className="h-4 w-4 ml-1 text-gray-400" />
+                    </div>
+                  </th>
+                  <th
+                    scope="col"
+                    className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider"
+                  >
+                    Actions
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody className="bg-white divide-y divide-gray-200">
+                {responses.map((response, index) => (
+                  <motion.tr
+                    key={response.id}
+                    className={`hover:bg-gray-50 ${response.flagged_for_review ? 'bg-yellow-50' : ''}`}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.3, delay: index * 0.05 }}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <input
+                        type="checkbox"
+                        checked={selectedResponses.includes(response.id)}
+                        onChange={() => handleSelectResponse(response.id)}
+                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                      />
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="flex items-center">
+                        <div className="flex-shrink-0 h-8 w-8 bg-gray-100 rounded-full flex items-center justify-center">
+                          {response.patient_email ? (
+                            <Mail className="h-4 w-4 text-gray-500" />
+                          ) : (
+                            <User className="h-4 w-4 text-gray-500" />
+                          )}
+                        </div>
+                        <div className="ml-3">
+                          <div className="text-sm font-medium text-gray-900">
+                            {response.patient_name || 'Anonymous'}
+                          </div>
+                          {response.patient_email && (
+                            <div className="text-xs text-gray-500">{response.patient_email}</div>
+                          )}
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm font-medium text-gray-900">
+                        {response.score !== null ? response.score : 'N/A'}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <Badge
+                        variant={
+                          response.risk_level === 'high' ? 'danger' :
+                          response.risk_level === 'medium' || response.risk_level === 'moderate' ? 'warning' :
+                          response.risk_level === 'mild' ? 'info' : 'success'
+                        }
+                        className="capitalize"
+                      >
+                        {response.risk_level || 'N/A'}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      {response.flagged_for_review && (
+                        <Badge variant="danger" className="flex items-center">
+                          <Flag className="h-3 w-3 mr-1" />
+                          Flagged
+                        </Badge>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900">
+                        {response.completed_at
+                          ? new Date(response.completed_at).toLocaleDateString()
+                          : 'Incomplete'}
+                      </div>
+                      {response.completed_at && (
+                        <div className="text-xs text-gray-500">
+                          {new Date(response.completed_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <div className="flex justify-end space-x-2">
+                        <Button
+                          variant="light"
+                          size="small"
+                          onClick={() => router.push(`/admin/responses/${response.id}`)}
+                          className="flex items-center text-blue-600 hover:text-blue-900"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="light"
+                          size="small"
+                          onClick={() => handleOpenAnalysis(response.id)}
+                          className="flex items-center text-purple-600 hover:text-purple-900"
+                        >
+                          <Brain className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="light"
+                          size="small"
+                          onClick={() => router.push(`/admin/email/send?responses=${response.id}`)}
+                          className="flex items-center text-indigo-600 hover:text-indigo-900"
+                        >
+                          <Mail className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          variant="light"
+                          size="small"
+                          onClick={() => handleFlag(response.id, !response.flagged_for_review)}
+                          className={`flex items-center ${response.flagged_for_review ? 'text-gray-600 hover:text-gray-900' : 'text-red-600 hover:text-red-900'}`}
+                        >
+                          <Flag className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    </td>
+                  </motion.tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
-    </div>
+
+      {/* AI Analysis Modal */}
+      <AnimatePresence>
+        {analysisModal.isOpen && analysisModal.responseId && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
+            <AIAnalysisModal
+              responseId={analysisModal.responseId}
+              isOpen={analysisModal.isOpen}
+              onClose={handleCloseAnalysis}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

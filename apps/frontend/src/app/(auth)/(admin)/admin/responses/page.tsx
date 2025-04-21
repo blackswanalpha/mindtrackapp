@@ -78,9 +78,14 @@ const ResponsesPage = () => {
         // Fetch questionnaires for filtering
         const questionnaireData = await api.questionnaires.getAll();
 
+        // Ensure questionnaireData is an array
+        const questionnairesArray = Array.isArray(questionnaireData)
+          ? questionnaireData
+          : questionnaireData?.questionnaires || [];
+
         // Add questionnaire titles to responses
         const enhancedResponses = responseData.map((response: Response) => {
-          const questionnaire = questionnaireData.find((q: Questionnaire) => q.id === response.questionnaire_id);
+          const questionnaire = questionnairesArray.find((q: Questionnaire) => q.id === response.questionnaire_id);
           return {
             ...response,
             questionnaire_title: questionnaire ? questionnaire.title : 'Unknown Questionnaire'
@@ -88,7 +93,7 @@ const ResponsesPage = () => {
         });
 
         setResponses(enhancedResponses);
-        setQuestionnaires(questionnaireData);
+        setQuestionnaires(questionnairesArray);
       } catch (error) {
         console.error('Error fetching data:', error);
         setError('Failed to load responses');

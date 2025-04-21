@@ -11,7 +11,8 @@ import {
   Tabs,
   TabsList,
   TabsTrigger,
-  TabsContent
+  TabsContent,
+  Badge
 } from '@/components/common';
 import {
   ArrowLeft,
@@ -25,9 +26,13 @@ import {
   User,
   Mail,
   Calendar,
-  Clock
+  Clock,
+  Send,
+  Edit
 } from 'lucide-react';
+import { motion } from 'framer-motion';
 import api from '@/services/api';
+import ScoreVisualizer from '@/components/scoring/ScoreVisualizer';
 
 type Answer = {
   id: number;
@@ -446,14 +451,18 @@ const ResponseScoringDetailPage = () => {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                       <h3 className="text-lg font-medium text-gray-700 mb-2">Current Score</h3>
-                      <div className="flex items-center">
-                        <div className="text-4xl font-bold mr-4">{response.score || 0}</div>
-                        <div className={`px-3 py-1 rounded-full text-sm font-medium capitalize`}
-                          style={{ backgroundColor: `${getRiskLevelColor(response.risk_level || 'minimal')}20`,
-                                  color: getRiskLevelColor(response.risk_level || 'minimal') }}>
-                          {response.risk_level || 'Not scored'}
-                        </div>
-                      </div>
+                      {scoringSystem && response.score !== undefined && (
+                        <ScoreVisualizer
+                          score={response.score}
+                          maxScore={27} // PHQ-9 max score
+                          riskLevel={response.risk_level}
+                          riskLevels={scoringSystem.ranges}
+                          size="medium"
+                          animated={true}
+                          showDetails={false}
+                          className="mb-4"
+                        />
+                      )}
                       <p className="text-gray-600 mt-2">
                         {getRiskLevelDescription(response.risk_level || 'minimal')}
                       </p>

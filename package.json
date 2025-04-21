@@ -13,6 +13,7 @@
     "start": "npm run start --workspace=api"
   },
   "devDependencies": {
+    "@types/uuid": "^10.0.0",
     "autoprefixer": "^10.4.21",
     "concurrently": "^8.2.2",
     "postcss": "^8.5.3",

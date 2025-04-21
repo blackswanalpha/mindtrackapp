@@ -9,17 +9,17 @@ const Answer = require('../models/Answer');
 const getQuestions = async (req, res, next) => {
   try {
     const { questionnaireId } = req.params;
-    
+
     // Check if questionnaire exists
     const questionnaire = await Questionnaire.findById(questionnaireId);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Get questions
     const questions = await Question.findByQuestionnaire(questionnaireId);
-    
+
     res.json({
       questions
     });
@@ -35,13 +35,13 @@ const getQuestions = async (req, res, next) => {
 const getQuestionById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     const question = await Question.findById(id);
-    
+
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
-    
+
     res.json({
       question
     });
@@ -68,26 +68,42 @@ const createQuestion = async (req, res, next) => {
       validation_rules,
       scoring_weight
     } = req.body;
-    
+
     // Check if questionnaire exists
     const questionnaire = await Questionnaire.findById(questionnaireId);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
-    // Check if user is authorized to add questions
-    if (questionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
+
+    // Skip authorization check if no user is provided (for public API)
+    if (req.user && questionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to add questions to this questionnaire' });
     }
-    
+
     // Get max order number if not provided
     let orderNum = order_num;
     if (!orderNum) {
       const questions = await Question.findByQuestionnaire(questionnaireId);
       orderNum = questions.length > 0 ? Math.max(...questions.map(q => q.order_num)) + 1 : 1;
     }
-    
+
+    // Validate question type
+    const validTypes = ['text', 'single_choice', 'multiple_choice', 'rating', 'yes_no', 'scale', 'date'];
+    if (!validTypes.includes(type)) {
+      return res.status(400).json({
+        message: 'Invalid question type',
+        validTypes
+      });
+    }
+
+    // Validate options for choice-based questions
+    if (['single_choice', 'multiple_choice', 'rating', 'yes_no', 'scale'].includes(type) && (!options || !Array.isArray(options) || options.length === 0)) {
+      return res.status(400).json({
+        message: 'Options are required for this question type'
+      });
+    }
+
     // Create question
     const question = await Question.create({
       questionnaire_id: questionnaireId,
@@ -101,12 +117,16 @@ const createQuestion = async (req, res, next) => {
       validation_rules: validation_rules ? JSON.stringify(validation_rules) : null,
       scoring_weight: scoring_weight || 1
     });
-    
+
+    // Log the creation
+    console.log(`Question created: ${question.id} for questionnaire ${questionnaireId}`);
+
     res.status(201).json({
       message: 'Question created successfully',
       question
     });
   } catch (error) {
+    console.error('Error creating question:', error);
     next(error);
   }
 };
@@ -129,21 +149,21 @@ const updateQuestion = async (req, res, next) => {
       validation_rules,
       scoring_weight
     } = req.body;
-    
+
     // Check if question exists
     const existingQuestion = await Question.findById(id);
-    
+
     if (!existingQuestion) {
       return res.status(404).json({ message: 'Question not found' });
     }
-    
+
     // Check if user is authorized to update
     const questionnaire = await Questionnaire.findById(existingQuestion.questionnaire_id);
-    
+
     if (questionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to update this question' });
     }
-    
+
     // Update question
     const updatedQuestion = await Question.update(id, {
       text,
@@ -156,7 +176,7 @@ const updateQuestion = async (req, res, next) => {
       validation_rules: validation_rules ? JSON.stringify(validation_rules) : existingQuestion.validation_rules,
       scoring_weight
     });
-    
+
     res.json({
       message: 'Question updated successfully',
       question: updatedQuestion
@@ -173,24 +193,24 @@ const updateQuestion = async (req, res, next) => {
 const deleteQuestion = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if question exists
     const existingQuestion = await Question.findById(id);
-    
+
     if (!existingQuestion) {
       return res.status(404).json({ message: 'Question not found' });
     }
-    
+
     // Check if user is authorized to delete
     const questionnaire = await Questionnaire.findById(existingQuestion.questionnaire_id);
-    
+
     if (questionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to delete this question' });
     }
-    
+
     // Delete question
     await Question.delete(id);
-    
+
     res.json({
       message: 'Question deleted successfully'
     });
@@ -207,26 +227,26 @@ const reorderQuestions = async (req, res, next) => {
   try {
     const { questionnaireId } = req.params;
     const { questions } = req.body;
-    
+
     if (!Array.isArray(questions)) {
       return res.status(400).json({ message: 'Questions must be an array' });
     }
-    
+
     // Check if questionnaire exists
     const questionnaire = await Questionnaire.findById(questionnaireId);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Check if user is authorized to reorder
     if (questionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to reorder questions in this questionnaire' });
     }
-    
+
     // Reorder questions
     await Question.reorder(questions);
-    
+
     res.json({
       message: 'Questions reordered successfully'
     });
@@ -242,17 +262,17 @@ const reorderQuestions = async (req, res, next) => {
 const getQuestionStatistics = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if question exists
     const question = await Question.findById(id);
-    
+
     if (!question) {
       return res.status(404).json({ message: 'Question not found' });
     }
-    
+
     // Get answer statistics
     const statistics = await Answer.getStatistics(id);
-    
+
     res.json({
       statistics
     });

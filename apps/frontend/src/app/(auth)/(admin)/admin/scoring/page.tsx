@@ -26,7 +26,8 @@ import {
   HelpCircle,
   ArrowRight,
   FileText,
-  Sliders
+  Sliders,
+  Activity
 } from 'lucide-react';
 import api from '@/services/api';
 
@@ -321,14 +322,23 @@ const ScoringSystemsPage = () => {
           <h2 className="sr-only">Tabs</h2>
         </div>
 
-        <Button
-          variant="secondary"
-          onClick={() => router.push('/admin/scoring/responses')}
-          className="ml-4"
-        >
-          <FileText className="h-4 w-4 mr-2" />
-          Manage Response Scoring
-        </Button>
+        <div className="flex space-x-3">
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/admin/scoring/dashboard')}
+            className="ml-4"
+          >
+            <BarChart3 className="h-4 w-4 mr-2" />
+            Scoring Dashboard
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => router.push('/admin/scoring/responses')}
+          >
+            <FileText className="h-4 w-4 mr-2" />
+            Manage Response Scoring
+          </Button>
+        </div>
       </div>
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full">

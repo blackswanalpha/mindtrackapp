@@ -2,9 +2,10 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { Edit, Trash2, GripVertical, Eye, Plus } from 'lucide-react';
+import { Edit, Trash2, GripVertical, Eye, Plus, Copy, AlertTriangle, CheckCircle, HelpCircle, List, Calendar, Star, ToggleLeft } from 'lucide-react';
 import { Button } from '@/components/common';
 import api from '@/services/api';
+import { motion, AnimatePresence } from 'framer-motion';
 
 type Question = {
   id: number;
@@ -36,10 +37,17 @@ const QuestionList: React.FC<QuestionListProps> = ({ questionnaireId }) => {
       try {
         if (typeof window !== 'undefined') {
           try {
-            const questions = await api.questions.getByQuestionnaire(questionnaireId);
-            setQuestions(questions);
+            console.log('Fetching questions for questionnaire ID:', questionnaireId);
+            const response = await api.questions.getByQuestionnaire(questionnaireId);
+            console.log('Fetched questions:', response);
+
+            // Handle different response formats
+            const questionsData = Array.isArray(response) ? response :
+                               (response.questions ? response.questions : []);
+
+            setQuestions(questionsData);
           } catch (err) {
-            console.error(err);
+            console.error('Error fetching questions:', err);
             setError('Failed to load questions from API, using mock data');
 
             // Fallback to mock data if API fails
@@ -281,6 +289,28 @@ const QuestionList: React.FC<QuestionListProps> = ({ questionnaireId }) => {
     }
   };
 
+  // Get icon for question type
+  const getQuestionTypeIcon = (type: string) => {
+    switch (type) {
+      case 'text':
+        return <HelpCircle className="h-4 w-4 text-blue-500" />;
+      case 'single_choice':
+        return <CheckCircle className="h-4 w-4 text-green-500" />;
+      case 'multiple_choice':
+        return <List className="h-4 w-4 text-purple-500" />;
+      case 'rating':
+        return <Star className="h-4 w-4 text-yellow-500" />;
+      case 'yes_no':
+        return <ToggleLeft className="h-4 w-4 text-indigo-500" />;
+      case 'scale':
+        return <List className="h-4 w-4 text-orange-500" />;
+      case 'date':
+        return <Calendar className="h-4 w-4 text-red-500" />;
+      default:
+        return <HelpCircle className="h-4 w-4 text-gray-500" />;
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-32">
@@ -315,79 +345,112 @@ const QuestionList: React.FC<QuestionListProps> = ({ questionnaireId }) => {
 
   return (
     <div className="space-y-4">
-      {questions.map((question) => (
-        <div
-          key={question.id}
-          draggable
-          onDragStart={() => handleDragStart(question.id)}
-          onDragOver={(e) => handleDragOver(e, question.id)}
-          onDragEnd={handleDragEnd}
-          className={`bg-white border rounded-lg shadow-sm p-4 ${
-            isDragging && draggedQuestionId === question.id ? 'opacity-50' : ''
-          } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
-        >
-          <div className="flex items-start">
-            <div className="flex-shrink-0 mr-3 mt-1 text-gray-400">
-              <GripVertical className="h-5 w-5" />
-            </div>
-
-            <div className="flex-grow">
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center">
-                  <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full mr-2">
-                    {question.order_num}
-                  </span>
-                  <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full">
-                    {getQuestionTypeDisplay(question.type)}
-                  </span>
-                  {question.required && (
-                    <span className="ml-2 text-xs text-red-500">Required</span>
-                  )}
-                </div>
-
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => router.push(`/admin/questionnaires/${questionnaireId}/questions/${question.id}`)}
-                    className="text-gray-500 hover:text-gray-700"
-                    title="View Question"
-                  >
-                    <Eye className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => router.push(`/admin/questionnaires/${questionnaireId}/questions/${question.id}/edit`)}
-                    className="text-blue-500 hover:text-blue-700"
-                    title="Edit Question"
-                  >
-                    <Edit className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(question.id)}
-                    className="text-red-500 hover:text-red-700"
-                    title="Delete Question"
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </button>
-                </div>
+      <AnimatePresence>
+        {questions.map((question, index) => (
+          <motion.div
+            key={question.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            draggable
+            onDragStart={() => handleDragStart(question.id)}
+            onDragOver={(e) => handleDragOver(e, question.id)}
+            onDragEnd={handleDragEnd}
+            className={`bg-white border rounded-lg shadow-sm p-4 hover:shadow-md transition-all duration-200 ${
+              isDragging && draggedQuestionId === question.id ? 'opacity-50 border-blue-300 bg-blue-50' : ''
+            } ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
+          >
+            <div className="flex items-start">
+              <div className="flex-shrink-0 mr-3 mt-1 text-gray-400 hover:text-gray-600 transition-colors">
+                <GripVertical className="h-5 w-5" />
               </div>
 
-              <p className="text-gray-800">{question.text}</p>
+              <div className="flex-grow">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center flex-wrap gap-2">
+                    <span className="bg-gray-100 text-gray-700 text-xs font-medium px-2 py-1 rounded-full">
+                      {question.order_num}
+                    </span>
+                    <span className="bg-blue-100 text-blue-700 text-xs font-medium px-2 py-1 rounded-full flex items-center">
+                      {getQuestionTypeIcon(question.type)}
+                      <span className="ml-1">{getQuestionTypeDisplay(question.type)}</span>
+                    </span>
+                    {question.required && (
+                      <span className="bg-red-100 text-red-700 text-xs font-medium px-2 py-1 rounded-full flex items-center">
+                        <AlertTriangle className="h-3 w-3 mr-1" />
+                        Required
+                      </span>
+                    )}
+                  </div>
 
-              {question.options && question.options.length > 0 && (
-                <div className="mt-2 pl-2 border-l-2 border-gray-200">
-                  <p className="text-xs text-gray-500 mb-1">Options:</p>
-                  <div className="grid grid-cols-2 gap-1">
-                    {question.options.map((option) => (
-                      <div key={option.value} className="text-sm text-gray-600">
-                        {option.label} ({option.value})
-                      </div>
-                    ))}
+                  <div className="flex space-x-2">
+                    <Button
+                      className="bg-white border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors p-1.5"
+                      aria-label="View question"
+                      onClick={() => router.push(`/admin/questionnaires/${questionnaireId}/questions/${question.id}`)}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      className="bg-white border border-gray-300 text-blue-600 hover:bg-blue-50 hover:border-blue-300 transition-colors p-1.5"
+                      aria-label="Edit question"
+                      onClick={() => router.push(`/admin/questionnaires/${questionnaireId}/questions/${question.id}/edit`)}
+                    >
+                      <Edit className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      className="bg-white border border-gray-300 text-indigo-600 hover:bg-indigo-50 hover:border-indigo-300 transition-colors p-1.5"
+                      aria-label="Duplicate question"
+                      onClick={() => {
+                        // This would duplicate the question
+                        alert('Duplicate functionality would be implemented here');
+                      }}
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      className="bg-white border border-gray-300 text-red-600 hover:bg-red-50 hover:border-red-300 transition-colors p-1.5"
+                      aria-label="Delete question"
+                      onClick={() => handleDelete(question.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
-              )}
+
+                <p className="text-gray-800 font-medium">{question.text}</p>
+
+                {question.options && question.options.length > 0 && (
+                  <div className="mt-3 pl-3 border-l-2 border-gray-200">
+                    <p className="text-xs text-gray-500 mb-2 font-medium">Options:</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      {Array.isArray(question.options) ?
+                        question.options.map((option, optIndex) => (
+                          <motion.div
+                            key={optIndex}
+                            initial={{ opacity: 0, x: -5 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ duration: 0.2, delay: optIndex * 0.05 }}
+                            className="flex items-center p-1.5 bg-gray-50 rounded-md text-sm text-gray-700"
+                          >
+                            <div className="flex-shrink-0 w-5 h-5 flex items-center justify-center bg-blue-100 text-blue-800 rounded-full mr-2 text-xs font-medium">
+                              {option.value}
+                            </div>
+                            <span>{option.label}</span>
+
+                          </motion.div>
+                        )) :
+                        <p className="text-gray-500 italic text-sm">Options data format is not valid.</p>
+                      }
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
-          </div>
-        </div>
-      ))}
+          </motion.div>
+        ))}
+      </AnimatePresence>
     </div>
   );
 };

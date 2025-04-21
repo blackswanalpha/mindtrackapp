@@ -19,7 +19,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Bell,
-  Calculator
+  Calculator,
+  Activity
 } from 'lucide-react';
 
 type NavItemProps = {
@@ -178,12 +179,13 @@ const DashboardLayout: React.FC<DashboardLayoutProps> = ({ children }) => {
                 active={pathname?.startsWith('/users')}
               />
             </li>
+           
             <li>
               <NavItem
-                href="/admin/analytics"
-                icon={<BarChart3 className="h-5 w-5" />}
-                label={sidebarOpen ? 'Analytics' : ''}
-                active={pathname?.startsWith('/analytics')}
+                href="/admin/analysis"
+                icon={<Activity className="h-5 w-5" />}
+                label={sidebarOpen ? 'Analystics' : ''}
+                active={pathname?.startsWith('/admin/analysis')}
               />
             </li>
             <li>

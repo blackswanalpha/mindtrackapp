@@ -53,13 +53,21 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
       try {
         if (typeof window !== 'undefined') {
           const orgs = await api.organizations.getAll();
+          // Always add 'Individual' option if not present
+          const hasIndividual = orgs.some((org: any) => org.name === 'Individual');
+          if (!hasIndividual) {
+            orgs.unshift({ id: 0, name: 'Individual', description: 'For individual use' });
+          }
           setOrganizations(orgs);
         }
       } catch (err) {
-        console.error('Failed to fetch organizations:', err);
+        // Fallback with at least the Individual option
+        setOrganizations([
+          { id: 0, name: 'Individual', description: 'For individual use' },
+          { id: 1, name: 'Mental Health Clinic', description: 'Default organization' }
+        ]);
       }
     };
-
     fetchOrganizations();
   }, []);
 
@@ -86,31 +94,36 @@ const QuestionnaireForm: React.FC<QuestionnaireFormProps> = ({
       // Format data for API
       const apiData = {
         ...formData,
-        estimated_time: formData.estimated_time ? parseInt(formData.estimated_time) : undefined,
+        estimated_time_minutes: formData.estimated_time ? parseInt(formData.estimated_time) : undefined,
         max_responses: formData.max_responses ? parseInt(formData.max_responses) : undefined,
         organization_id: parseInt(formData.organization_id.toString()),
       };
 
+      console.log('Submitting questionnaire data:', apiData);
+
       if (isEditing && initialData?.id) {
         // Update existing questionnaire
-        await api.questionnaires.update(initialData.id, apiData);
+        const updatedQuestionnaire = await api.questionnaires.update(initialData.id, apiData);
+        console.log('Questionnaire updated successfully:', updatedQuestionnaire);
         setSuccess('Questionnaire updated successfully!');
 
         // Wait a moment to show success message
         setTimeout(() => {
-          router.push(`/questionnaires/${initialData.id}`);
+          router.push(`/admin/questionnaires/${initialData.id}`);
         }, 1500);
       } else {
         // Create new questionnaire
         const newQuestionnaire = await api.questionnaires.create(apiData);
+        console.log('Questionnaire created successfully:', newQuestionnaire);
         setSuccess('Questionnaire created successfully!');
 
         // Wait a moment to show success message
         setTimeout(() => {
-          router.push(`/questionnaires/${newQuestionnaire.id}`);
+          router.push(`/admin/questionnaires/${newQuestionnaire.id}`);
         }, 1500);
       }
     } catch (err) {
+      console.error('Error saving questionnaire:', err);
       setError(err instanceof Error ? err.message : 'An error occurred while saving the questionnaire');
     } finally {
       setIsLoading(false);

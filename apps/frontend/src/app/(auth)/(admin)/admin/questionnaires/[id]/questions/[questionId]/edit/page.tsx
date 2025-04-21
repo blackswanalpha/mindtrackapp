@@ -3,14 +3,14 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { 
-  Card, 
-  Button, 
-  Loading, 
-  Alert 
+import {
+  Card,
+  Button,
+  Loading,
+  Alert
 } from '@/components/common';
-import { 
-  ArrowLeft 
+import {
+  ArrowLeft
 } from 'lucide-react';
 import QuestionForm from '@/components/questionnaire/QuestionForm';
 import api from '@/services/api';
@@ -30,17 +30,21 @@ const EditQuestionPage = () => {
 
       try {
         if (typeof window !== 'undefined') {
+          console.log('Fetching data for question edit, ID:', questionId);
+
           // Fetch questionnaire
           const questionnaireData = await api.questionnaires.getById(Number(id));
+          console.log('Fetched questionnaire:', questionnaireData);
           setQuestionnaire(questionnaireData);
-          
+
           // Fetch question
           const questionData = await api.questions.getById(Number(questionId));
+          console.log('Fetched question for editing:', questionData);
           setQuestion(questionData);
         }
       } catch (err) {
+        console.error('Error loading question data for editing:', err);
         setError('Failed to load question data');
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
@@ -64,8 +68,8 @@ const EditQuestionPage = () => {
       <div className="container mx-auto px-4 py-8">
         <Alert type="error" message={error || 'Failed to load question data'} />
         <div className="mt-4">
-          <Button 
-            variant="primary" 
+          <Button
+            variant="primary"
             onClick={() => router.push(`/questionnaires/${id}/questions`)}
           >
             Back to Questions
@@ -78,7 +82,7 @@ const EditQuestionPage = () => {
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="flex items-center mb-6">
-        <Link href={`/questionnaires/${id}/questions`} className="text-blue-600 hover:text-blue-800 mr-4">
+        <Link href={`/admin/questionnaires/${id}/questions`} className="text-blue-600 hover:text-blue-800 mr-4">
           <ArrowLeft className="h-5 w-5" />
         </Link>
         <div>
@@ -88,12 +92,12 @@ const EditQuestionPage = () => {
           </p>
         </div>
       </div>
-      
+
       <Card>
-        <QuestionForm 
-          questionnaireId={Number(id)} 
-          initialData={question} 
-          isEditing={true} 
+        <QuestionForm
+          questionnaireId={Number(id)}
+          initialData={question}
+          isEditing={true}
         />
       </Card>
     </div>

@@ -1,6 +1,7 @@
 const Questionnaire = require('../models/Questionnaire');
 const Question = require('../models/Question');
 const Response = require('../models/Response');
+const qrCodeService = require('../services/qrCodeService');
 
 /**
  * Get all questionnaires
@@ -8,17 +9,17 @@ const Response = require('../models/Response');
  */
 const getQuestionnaires = async (req, res, next) => {
   try {
-    const { 
-      is_active, 
-      is_public, 
+    const {
+      is_active,
+      is_public,
       is_template,
       created_by_id,
       organization_id,
       search
     } = req.query;
-    
+
     let questionnaires;
-    
+
     if (search) {
       // Search by title or description
       questionnaires = await Questionnaire.search(search);
@@ -43,7 +44,7 @@ const getQuestionnaires = async (req, res, next) => {
         orderBy: [{ column: 'created_at', direction: 'DESC' }]
       });
     }
-    
+
     res.json({
       questionnaires
     });
@@ -59,13 +60,13 @@ const getQuestionnaires = async (req, res, next) => {
 const getQuestionnaireById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     const questionnaire = await Questionnaire.findById(id);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     res.json({
       questionnaire
     });
@@ -83,9 +84,10 @@ const createQuestionnaire = async (req, res, next) => {
     const {
       title,
       description,
+      instructions,
       type,
       category,
-      estimated_time,
+      estimated_time_minutes,
       is_active,
       is_adaptive,
       is_qr_enabled,
@@ -99,38 +101,49 @@ const createQuestionnaire = async (req, res, next) => {
       organization_id,
       questions
     } = req.body;
-    
+
     // Create questionnaire
     const questionnaire = await Questionnaire.create({
       title,
       description,
-      type,
+      instructions,
+      type: type || 'standard',
       category,
-      estimated_time,
-      is_active,
-      is_adaptive,
-      is_qr_enabled,
-      is_template,
-      is_public,
-      allow_anonymous,
-      requires_auth,
+      estimated_time_minutes,
+      is_active: is_active !== undefined ? is_active : true,
+      is_adaptive: is_adaptive !== undefined ? is_adaptive : false,
+      is_qr_enabled: is_qr_enabled !== undefined ? is_qr_enabled : true,
+      is_template: is_template !== undefined ? is_template : false,
+      is_public: is_public !== undefined ? is_public : false,
+      allow_anonymous: allow_anonymous !== undefined ? allow_anonymous : true,
+      requires_auth: requires_auth !== undefined ? requires_auth : false,
       max_responses,
       expires_at,
       tags: tags ? JSON.stringify(tags) : null,
       organization_id,
-      created_by_id: req.user.id
+      created_by_id: req.user ? req.user.id : null
     });
-    
+
     // Create questions if provided
     if (questions && Array.isArray(questions) && questions.length > 0) {
       await Question.createBulk(questionnaire.id, questions);
     }
-    
+
+    // Generate QR code for the questionnaire
+    const baseUrl = `${req.protocol}://${req.get('host')}`;
+    const qrCodeDataUrl = await qrCodeService.generateQuestionnaireQRCode(questionnaire.id, baseUrl);
+
+    // Log the creation
+    console.log(`Questionnaire created: ${questionnaire.id} - ${title}`);
+
     res.status(201).json({
       message: 'Questionnaire created successfully',
-      questionnaire
+      questionnaire,
+      qrCode: qrCodeDataUrl,
+      url: `${baseUrl}/questionnaires/respond/${questionnaire.id}`
     });
   } catch (error) {
+    console.error('Error creating questionnaire:', error);
     next(error);
   }
 };
@@ -160,19 +173,19 @@ const updateQuestionnaire = async (req, res, next) => {
       tags,
       organization_id
     } = req.body;
-    
+
     // Check if questionnaire exists
     const existingQuestionnaire = await Questionnaire.findById(id);
-    
+
     if (!existingQuestionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Check if user is authorized to update
     if (existingQuestionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to update this questionnaire' });
     }
-    
+
     // Update questionnaire
     const updatedQuestionnaire = await Questionnaire.update(id, {
       title,
@@ -192,7 +205,7 @@ const updateQuestionnaire = async (req, res, next) => {
       tags: tags ? JSON.stringify(tags) : existingQuestionnaire.tags,
       organization_id
     });
-    
+
     res.json({
       message: 'Questionnaire updated successfully',
       questionnaire: updatedQuestionnaire
@@ -209,22 +222,22 @@ const updateQuestionnaire = async (req, res, next) => {
 const deleteQuestionnaire = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if questionnaire exists
     const existingQuestionnaire = await Questionnaire.findById(id);
-    
+
     if (!existingQuestionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Check if user is authorized to delete
     if (existingQuestionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to delete this questionnaire' });
     }
-    
+
     // Delete questionnaire
     await Questionnaire.delete(id);
-    
+
     res.json({
       message: 'Questionnaire deleted successfully'
     });
@@ -240,17 +253,17 @@ const deleteQuestionnaire = async (req, res, next) => {
 const getQuestionnaireWithQuestions = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Get questionnaire
     const questionnaire = await Questionnaire.findById(id);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Get questions
     const questions = await Question.findByQuestionnaire(id);
-    
+
     res.json({
       questionnaire,
       questions
@@ -268,19 +281,19 @@ const createQuestionnaireVersion = async (req, res, next) => {
   try {
     const { id } = req.params;
     const { title, description } = req.body;
-    
+
     // Check if questionnaire exists
     const existingQuestionnaire = await Questionnaire.findById(id);
-    
+
     if (!existingQuestionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Check if user is authorized to create version
     if (existingQuestionnaire.created_by_id !== req.user.id && req.user.role !== 'admin') {
       return res.status(403).json({ message: 'Not authorized to create version of this questionnaire' });
     }
-    
+
     // Create new version
     const newQuestionnaire = await Questionnaire.createVersion(id, {
       title: title || `${existingQuestionnaire.title} (Copy)`,
@@ -301,20 +314,20 @@ const createQuestionnaireVersion = async (req, res, next) => {
       organization_id: existingQuestionnaire.organization_id,
       created_by_id: req.user.id
     });
-    
+
     // Get questions from original questionnaire
     const questions = await Question.findByQuestionnaire(id);
-    
+
     // Create questions for new version
     if (questions.length > 0) {
       const newQuestions = questions.map(q => {
         const { id, questionnaire_id, created_at, updated_at, ...questionData } = q;
         return questionData;
       });
-      
+
       await Question.createBulk(newQuestionnaire.id, newQuestions);
     }
-    
+
     res.status(201).json({
       message: 'Questionnaire version created successfully',
       questionnaire: newQuestionnaire
@@ -331,17 +344,17 @@ const createQuestionnaireVersion = async (req, res, next) => {
 const getQuestionnaireStatistics = async (req, res, next) => {
   try {
     const { id } = req.params;
-    
+
     // Check if questionnaire exists
     const questionnaire = await Questionnaire.findById(id);
-    
+
     if (!questionnaire) {
       return res.status(404).json({ message: 'Questionnaire not found' });
     }
-    
+
     // Get response statistics
     const statistics = await Response.getStatistics(id);
-    
+
     res.json({
       statistics
     });

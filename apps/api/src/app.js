@@ -8,7 +8,14 @@ const routes = require('./routes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CORS_ORIGIN || '*',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
+
+// Log CORS configuration
+console.log('CORS configured with origin:', process.env.CORS_ORIGIN || '*');
 app.use(morgan('dev'));
 app.use(compression());
 app.use(express.json());

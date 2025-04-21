@@ -41,9 +41,21 @@ const GoogleFormsPage = () => {
   const fetchStatistics = async () => {
     try {
       const response = await apiClient.get('/google-forms/statistics');
-      setStatistics(response.data.data);
+      setStatistics(response.data.data || {
+        total_responses: 0,
+        unique_respondents: 0,
+        first_response: null,
+        last_response: null
+      });
     } catch (error) {
       console.error('Failed to fetch statistics:', error);
+      // Set default statistics instead of failing
+      setStatistics({
+        total_responses: 0,
+        unique_respondents: 0,
+        first_response: null,
+        last_response: null
+      });
     }
   };
 

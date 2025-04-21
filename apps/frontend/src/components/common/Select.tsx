@@ -28,7 +28,7 @@ const Select: React.FC<SelectProps> = ({
   name,
   value,
   onChange,
-  options,
+  options = [],
   placeholder,
   disabled = false,
   required = false,
@@ -39,7 +39,7 @@ const Select: React.FC<SelectProps> = ({
 }) => {
   // Generate unique ID if not provided
   const selectId = id || `select-${Math.random().toString(36).substr(2, 9)}`;
-  
+
   return (
     <div className="w-full">
       {/* Label */}
@@ -52,7 +52,7 @@ const Select: React.FC<SelectProps> = ({
           {required && <span className="text-red-500 ml-1">*</span>}
         </label>
       )}
-      
+
       {/* Select */}
       <select
         id={selectId}
@@ -77,9 +77,9 @@ const Select: React.FC<SelectProps> = ({
             {placeholder}
           </option>
         )}
-        
+
         {/* Options */}
-        {options.map(option => (
+        {Array.isArray(options) && options.map(option => (
           <option
             key={option.value}
             value={option.value}
@@ -89,7 +89,7 @@ const Select: React.FC<SelectProps> = ({
           </option>
         ))}
       </select>
-      
+
       {/* Error message */}
       {error && (
         <p
@@ -99,7 +99,7 @@ const Select: React.FC<SelectProps> = ({
           {error}
         </p>
       )}
-      
+
       {/* Help text */}
       {helpText && !error && (
         <p

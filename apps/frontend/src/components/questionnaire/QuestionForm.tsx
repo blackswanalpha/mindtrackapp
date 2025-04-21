@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '@/services/api';
 
@@ -21,9 +21,19 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
     type: initialData?.type || 'text',
     required: initialData?.required ?? true,
     order_num: initialData?.order_num || '',
-    options: initialData?.options ? JSON.parse(initialData.options) : [],
+    options: initialData?.options ?
+      (typeof initialData.options === 'string' ?
+        JSON.parse(initialData.options) : initialData.options) :
+      [],
     scoring_weight: initialData?.scoring_weight || 1,
   });
+
+  // Log initial data for debugging
+  useEffect(() => {
+    if (initialData) {
+      console.log('Initial question data:', initialData);
+    }
+  }, [initialData]);
 
   const [newOption, setNewOption] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -72,20 +82,26 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
       // Format data for API
       const apiData = {
         ...formData,
-        order_num: formData.order_num ? parseInt(formData.order_num) : undefined,
+        order_num: formData.order_num ? parseInt(formData.order_num.toString()) : undefined,
         scoring_weight: parseInt(formData.scoring_weight.toString()),
+        options: formData.options.length > 0 ? JSON.stringify(formData.options) : undefined,
+        questionnaire_id: questionnaireId
       };
+
+      console.log('Submitting question data:', apiData);
 
       if (isEditing && initialData?.id) {
         // Update existing question
         if (typeof window !== 'undefined') {
-          await api.questions.update(initialData.id, apiData);
+          const updatedQuestion = await api.questions.update(initialData.id, apiData);
+          console.log('Question updated successfully:', updatedQuestion);
           setSuccess('Question updated successfully!');
         }
       } else {
         // Create new question
         if (typeof window !== 'undefined') {
-          await api.questions.create(questionnaireId, apiData);
+          const newQuestion = await api.questions.create(questionnaireId, apiData);
+          console.log('Question created successfully:', newQuestion);
           setSuccess('Question created successfully!');
         }
       }
@@ -94,10 +110,10 @@ const QuestionForm: React.FC<QuestionFormProps> = ({
       await new Promise(resolve => setTimeout(resolve, 1500));
 
       // Redirect to questionnaire questions page
-      router.push(`/questionnaires/${questionnaireId}/questions`);
+      router.push(`/admin/questionnaires/${questionnaireId}/questions`);
     } catch (err) {
+      console.error('Error saving question:', err);
       setError(err instanceof Error ? err.message : 'An error occurred while saving the question');
-      console.error(err);
     } finally {
       setIsLoading(false);
     }

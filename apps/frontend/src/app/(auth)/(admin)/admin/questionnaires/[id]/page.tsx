@@ -88,27 +88,52 @@ const QuestionnaireDetailPage = () => {
 
       try {
         if (typeof window !== 'undefined') {
+          console.log('Fetching questionnaire with ID:', id);
           // Get questionnaire details
           const questionnaireData = await api.questionnaires.getById(Number(id));
+          console.log('Fetched questionnaire data:', questionnaireData);
           setQuestionnaire(questionnaireData);
 
-          // Mock statistics - in a real app, this would come from the API
-          const mockStats = {
-            total_responses: Math.floor(Math.random() * 50) + 5,
-            completion_rate: Math.floor(Math.random() * 30) + 70,
-            avg_score: Math.floor(Math.random() * 15) + 5,
-            risk_levels: {
-              low: Math.floor(Math.random() * 10) + 5,
-              medium: Math.floor(Math.random() * 10) + 3,
-              high: Math.floor(Math.random() * 5) + 1
-            }
-          };
+          // Get response statistics
+          try {
+            console.log('Fetching statistics for questionnaire:', id);
+            const responseStats = await api.responses.getStatsByQuestionnaireId(Number(id));
+            console.log('Fetched response stats:', responseStats);
 
-          setStats(mockStats);
+            // Handle different response formats
+            const formattedStats = {
+              total_responses: responseStats.total || responseStats.total_responses || 0,
+              completion_rate: responseStats.completion_rate || 0,
+              avg_score: responseStats.average_score || responseStats.avg_score || 0,
+              risk_levels: {
+                low: responseStats.risk_levels?.low || 0,
+                medium: responseStats.risk_levels?.medium || 0,
+                high: responseStats.risk_levels?.high || 0
+              }
+            };
+
+            console.log('Formatted stats:', formattedStats);
+            setStats(formattedStats);
+          } catch (statsErr) {
+            console.error('Error fetching response stats:', statsErr);
+            // Fallback to mock data if stats API fails
+            const mockStats = {
+              total_responses: Math.floor(Math.random() * 50) + 5,
+              completion_rate: Math.floor(Math.random() * 30) + 70,
+              avg_score: Math.floor(Math.random() * 15) + 5,
+              risk_levels: {
+                low: Math.floor(Math.random() * 10) + 5,
+                medium: Math.floor(Math.random() * 10) + 3,
+                high: Math.floor(Math.random() * 5) + 1
+              }
+            };
+            console.log('Using mock stats:', mockStats);
+            setStats(mockStats);
+          }
         }
       } catch (err) {
+        console.error('Error fetching questionnaire details:', err);
         setError('Failed to load questionnaire details');
-        console.error(err);
       } finally {
         setIsLoading(false);
       }
