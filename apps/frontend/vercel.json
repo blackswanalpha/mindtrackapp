@@ -3,5 +3,9 @@
   "framework": "nextjs",
   "buildCommand": "npm run build",
   "installCommand": "npm install",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://mindtrackapp-3hecu6ooe-victor-mbuguas-projects.vercel.app/api/v1",
+    "USE_MOCK_DATA": "false"
+  }
 }
