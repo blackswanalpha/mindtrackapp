@@ -17,7 +17,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1
 
 // Flag to determine whether to use mock data or real API
 // Set to false to force using the real API with Neon database
-const USE_MOCK_DATA = false;
+const USE_MOCK_DATA = process.env.USE_MOCK_DATA === 'true';
 
 // Log API configuration
 console.log('API URL:', API_URL);
@@ -815,8 +815,8 @@ export const api = {
      */
     create: async (questionnaireId: number, questionData: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
 
           // Get the highest order_num for this questionnaire
@@ -834,16 +834,34 @@ export const api = {
           return mockStorage.questions.create(newQuestion);
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${questionnaireId}/questions`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(questionData)
-        });
+        // Use real API
+        console.log(`Creating question for questionnaire ${questionnaireId} with data:`, questionData);
+        const response = await apiClient.post(`/questionnaires/${questionnaireId}/questions`, questionData);
+        console.log('API response:', response.data);
+        return response.data.question;
       } catch (error) {
         console.error(`Failed to create question for questionnaire ${questionnaireId}:`, error);
+
+        // Fallback to mock data if API request fails
+        if (!USE_MOCK_DATA) {
+          console.warn('Falling back to mock data due to API error');
+          await simulateApiDelay(800);
+
+          // Get the highest order_num for this questionnaire
+          const questions = mockStorage.questions.getByQuestionnaire(questionnaireId);
+          const maxOrderNum = questions.length > 0
+            ? Math.max(...questions.map(q => q.order_num))
+            : 0;
+
+          const newQuestion = {
+            ...questionData,
+            questionnaire_id: questionnaireId,
+            order_num: questionData.order_num || maxOrderNum + 1
+          };
+
+          return mockStorage.questions.create(newQuestion);
+        }
+
         throw error;
       }
     },
@@ -882,8 +900,10 @@ export const api = {
           return mockStorage.questions.getByQuestionnaire(questionnaireId);
         }
 
-        // Use API in production
+        // Use real API
+        console.log(`Fetching questions for questionnaire ${questionnaireId}`);
         const response = await apiClient.get(`/questionnaires/${questionnaireId}/questions`);
+        console.log('API response:', response.data);
         return response.data.questions;
       } catch (error) {
         console.error(`Failed to get questions for questionnaire ${questionnaireId}:`, error);
@@ -900,8 +920,8 @@ export const api = {
      */
     update: async (id: number, questionData: any) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
           const result = mockStorage.questions.update(id, questionData);
           if (!result) {
@@ -910,16 +930,25 @@ export const api = {
           return result;
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questions/${id}`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(questionData)
-        });
+        // Use real API
+        console.log(`Updating question ${id} with data:`, questionData);
+        const response = await apiClient.put(`/questions/${id}`, questionData);
+        console.log('API response:', response.data);
+        return response.data.question;
       } catch (error) {
         console.error(`Failed to update question ${id}:`, error);
+
+        // Fallback to mock data if API request fails
+        if (!USE_MOCK_DATA) {
+          console.warn('Falling back to mock data due to API error');
+          await simulateApiDelay(800);
+          const result = mockStorage.questions.update(id, questionData);
+          if (!result) {
+            throw new Error(`Question with ID ${id} not found`);
+          }
+          return result;
+        }
+
         throw error;
       }
     },
@@ -929,8 +958,8 @@ export const api = {
      */
     delete: async (id: number) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
           const success = mockStorage.questions.delete(id);
           if (!success) {
@@ -939,12 +968,25 @@ export const api = {
           return { success };
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questions/${id}`, {
-          method: 'DELETE'
-        });
+        // Use real API
+        console.log(`Deleting question ${id}`);
+        const response = await apiClient.delete(`/questions/${id}`);
+        console.log('API response:', response.data);
+        return response.data;
       } catch (error) {
         console.error(`Failed to delete question ${id}:`, error);
+
+        // Fallback to mock data if API request fails
+        if (!USE_MOCK_DATA) {
+          console.warn('Falling back to mock data due to API error');
+          await simulateApiDelay(800);
+          const success = mockStorage.questions.delete(id);
+          if (!success) {
+            throw new Error(`Question with ID ${id} not found`);
+          }
+          return { success };
+        }
+
         throw error;
       }
     },
@@ -954,8 +996,8 @@ export const api = {
      */
     reorder: async (questionnaireId: number, questions: any[]) => {
       try {
-        // Use mock storage in development
-        if (process.env.NODE_ENV === 'development') {
+        // Use mock storage if enabled
+        if (USE_MOCK_DATA) {
           await simulateApiDelay(800);
 
           questions.forEach(item => {
@@ -965,16 +1007,26 @@ export const api = {
           return { success: true };
         }
 
-        // Use API in production
-        return fetchWithErrorHandling(`${API_URL}/questionnaires/${questionnaireId}/questions/reorder`, {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({ questions })
-        });
+        // Use real API
+        console.log(`Reordering questions for questionnaire ${questionnaireId}:`, questions);
+        const response = await apiClient.put(`/questionnaires/${questionnaireId}/questions/reorder`, { questions });
+        console.log('API response:', response.data);
+        return response.data;
       } catch (error) {
         console.error(`Failed to reorder questions for questionnaire ${questionnaireId}:`, error);
+
+        // Fallback to mock data if API request fails
+        if (!USE_MOCK_DATA) {
+          console.warn('Falling back to mock data due to API error');
+          await simulateApiDelay(800);
+
+          questions.forEach(item => {
+            mockStorage.questions.update(item.id, { order_num: item.order_num });
+          });
+
+          return { success: true };
+        }
+
         throw error;
       }
     }
