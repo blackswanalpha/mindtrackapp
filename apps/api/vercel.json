@@ -17,5 +17,12 @@
         "Access-Control-Allow-Headers": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
       }
     }
-  ]
+  ],
+  "env": {
+    "DATABASE_URL": "postgresql://mindtrack_db_owner:npg_sNtp0DQfH3ZI@ep-royal-snow-a2zqq5un-pooler.eu-central-1.aws.neon.tech/mindtrack_db?sslmode=require",
+    "JWT_SECRET": "mindtrack_jwt_secret_key_for_development",
+    "JWT_EXPIRES_IN": "24h",
+    "NODE_ENV": "production",
+    "CORS_ORIGIN": "*"
+  }
 }
