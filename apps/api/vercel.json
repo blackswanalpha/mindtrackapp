@@ -25,5 +25,6 @@
     "NODE_ENV": "production",
     "CORS_ORIGIN": "*"
   },
-  "public": true
+  "public": true,
+  "protection": false
 }
