@@ -17,7 +17,7 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api/v1
 
 // Flag to determine whether to use mock data or real API
 // Set to false to force using the real API with Neon database
-const USE_MOCK_DATA = process.env.USE_MOCK_DATA === 'true';
+const USE_MOCK_DATA = process.env.NEXT_PUBLIC_USE_MOCK_DATA === 'true';
 
 // Log API configuration
 console.log('API URL:', API_URL);
